@@ -1,0 +1,14 @@
+{
+  "name": "termina-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Internal 13x13 pixel glyph editor and drawer for the Termina icon set.",
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "@netlify/blobs": ">=8"
+  }
+}

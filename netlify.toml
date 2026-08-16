@@ -1,0 +1,18 @@
+[build]
+  publish = "public"
+  # No build step — the app is a single static file.
+  # `npm install` still runs so functions get @netlify/blobs.
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# The studio itself is passphrase-gated at the API layer, but keep it out
+# of search results and out of frames regardless.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"
+    X-Robots-Tag = "noindex, nofollow"
