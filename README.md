@@ -4,6 +4,8 @@ Internal tool for drawing and cataloguing the Termina 13×13 pixel icon set.
 
 ```
 public/index.html          the whole app — editor, drawer, export
+public/icon.svg            the app mark (drawn in the studio itself)
+scripts/make-icons.mjs     regenerates the icon PNGs from that SVG
 netlify/functions/sync     private working set (passphrase-gated)
 netlify/functions/publish  cuts a public snapshot of the final glyphs
 netlify/functions/public-set   GET /api/set        public, CORS-open
@@ -87,6 +89,22 @@ Or skip the build step entirely and reference the sprite:
 
 Publishing is explicit. Nothing becomes public until you mark a glyph final
 *and* click publish.
+
+## The app icon
+
+`public/icon.svg` is the mark, exported straight from the studio. iOS and the
+web manifest need rasters, so redraw it there, replace that file, and run:
+
+```bash
+node scripts/make-icons.mjs
+```
+
+That regenerates `icon-32/180/192/512` and the maskable variant, scaling the
+13×13 grid by whole integers so no pixel lands on a half boundary. The tiles are
+white-on-ink; flip `INK`/`PAPER` at the top of the script to invert them.
+
+On the tablet, Share → Add to Home Screen installs the studio as a standalone
+app with this icon.
 
 ## Glyph format
 
