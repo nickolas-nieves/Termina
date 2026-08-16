@@ -62,8 +62,10 @@
 }
 
 *{box-sizing:border-box}
-html,body{height:100%}
-/* Gutter belongs on the root so it reaches the viewport scrollbar. */
+/* Gutter belongs on the root so it reaches the viewport scrollbar.
+   Note: no `height:100%` here — that would cap the body box at one viewport
+   and a sticky header can only stick within its containing block, so the
+   masthead would scroll away after the first screenful of the drawer. */
 html{scrollbar-gutter:stable}
 body{
   margin:0;
