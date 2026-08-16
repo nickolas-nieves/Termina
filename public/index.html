@@ -284,14 +284,9 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
 .meta-row dt{color:var(--faint);letter-spacing:.03em}
 .meta-row dd{margin:0;color:var(--ink-soft);text-align:right;word-break:break-all}
 
-.shortcuts{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
-.shortcuts h3{
-  margin:0 0 10px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--faint);font-weight:400;
-}
-.shortcuts ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
-.shortcuts li{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted)}
-.shortcuts .keys{display:flex;gap:3px;flex:none}
+.shortcuts-list{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.shortcuts-list li{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:12.5px;color:var(--muted)}
+.shortcuts-list .keys{display:flex;gap:3px;flex:none}
 
 /* ── Status pills ───────────────────────────────────────── */
 .pill{
@@ -485,6 +480,13 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
 .menu button span.sub{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--faint)}
 .menu hr{border:none;border-top:1px solid var(--line);margin:5px 0}
 
+.tips-btn{width:31px;padding:0;justify-content:center}
+.menu-tips{min-width:286px;padding:15px 16px 16px}
+.menu-tips h3{
+  margin:0 0 11px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);font-weight:400;
+}
+
 @media (max-width:980px){
   .studio{grid-template-columns:1fr}
   .sidebar{position:static;height:auto;border-left:none;border-top:1px solid var(--line)}
@@ -521,6 +523,25 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
         <button data-export="copy-svg">Copy current SVG<span class="sub">clip</span></button>
         <hr>
         <button data-export="publish">Publish final glyphs<span class="sub">public</span></button>
+      </div>
+    </div>
+    <div class="menu-wrap">
+      <button class="btn btn-ghost tips-btn" id="btn-tips" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.4"/><path d="M6.4 6.2a1.7 1.7 0 113.2.8c-.3.5-1.1.8-1.3 1.3-.1.2-.1.4-.1.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11.4" r=".85" fill="currentColor"/></svg>
+      </button>
+      <div class="menu menu-tips" id="tips-menu">
+        <h3>Shortcuts</h3>
+        <ul class="shortcuts-list">
+          <li>Paint / erase<span class="keys"><kbd>drag</kbd></span></li>
+          <li>Erase only<span class="keys"><kbd>right-drag</kbd></span></li>
+          <li>Undo / redo<span class="keys"><kbd>⌘Z</kbd><kbd>⇧⌘Z</kbd></span></li>
+          <li>Nudge (wraps)<span class="keys"><kbd>← ↑ ↓ →</kbd></span></li>
+          <li>Mirror / rotate<span class="keys"><kbd>H</kbd><kbd>V</kbd><kbd>R</kbd></span></li>
+          <li>Invert / guides<span class="keys"><kbd>I</kbd><kbd>G</kbd></span></li>
+          <li>Clear grid<span class="keys"><kbd>⇧C</kbd></span></li>
+          <li>Save glyph<span class="keys"><kbd>⌘S</kbd></span></li>
+          <li>Search drawer<span class="keys"><kbd>/</kbd></span></li>
+        </ul>
       </div>
     </div>
   </div>
@@ -642,26 +663,12 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
           <div class="meta-row"><dt>Updated</dt><dd id="m-updated">—</dd></div>
         </dl>
 
-        <div class="shortcuts">
-          <h3>Shortcuts</h3>
-          <ul>
-            <li>Paint / erase<span class="keys"><kbd>drag</kbd></span></li>
-            <li>Erase only<span class="keys"><kbd>right-drag</kbd></span></li>
-            <li>Undo / redo<span class="keys"><kbd>⌘Z</kbd><kbd>⇧⌘Z</kbd></span></li>
-            <li>Nudge (wraps)<span class="keys"><kbd>← ↑ ↓ →</kbd></span></li>
-            <li>Mirror / rotate<span class="keys"><kbd>H</kbd><kbd>V</kbd><kbd>R</kbd></span></li>
-            <li>Invert / guides<span class="keys"><kbd>I</kbd><kbd>G</kbd></span></li>
-            <li>Save glyph<span class="keys"><kbd>⌘S</kbd></span></li>
-          </ul>
-        </div>
       </div>
 
       <div class="side-foot">
         <button class="btn btn-primary btn-block" id="btn-save">Add to set</button>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-block" id="btn-new">New glyph</button>
-          <button class="btn btn-block" id="btn-fork" disabled>Save as copy</button>
-        </div>
+        <button class="btn btn-block" id="btn-fork" disabled>Save as new glyph</button>
+        <button class="btn btn-ghost btn-block" id="btn-new">Start blank</button>
       </div>
     </aside>
   </div>
@@ -1130,31 +1137,52 @@ function formToIcon(id) {
     updatedAt: new Date().toISOString()
   };
 }
-function saveGlyph(asCopy) {
+function saveGlyph(asNew) {
   if (!countOn(grid)) { toast("Nothing drawn yet"); return; }
   if (!$("#f-name").value.trim()) { toast("Give the glyph a name first"); $("#f-name").focus(); return; }
 
-  if (editingId && !asCopy) {
-    const idx = icons.findIndex(i => i.id === editingId);
-    if (idx >= 0) {
-      const prev = icons[idx];
-      icons[idx] = Object.assign(formToIcon(editingId), { createdAt: prev.createdAt });
-      saveSet(); refreshAll(); scheduleSync();
-      toast(`Updated ${icons[idx].slug}`);
+  const src = editingId ? icons.find(i => i.id === editingId) : null;
+  const norm = s => String(s).trim().toLowerCase();
+
+  /* Update the glyph in place. */
+  if (src && !asNew) {
+    const next = Object.assign(formToIcon(editingId), { createdAt: src.createdAt });
+    if (icons.some(i => i.slug === next.slug && i.id !== editingId)) {
+      toast(`Another glyph already uses the slug "${next.slug}"`);
+      $("#f-slug").focus(); $("#f-slug").select();
       return;
     }
+    icons[icons.indexOf(src)] = next;
+    saveSet(); refreshAll(); scheduleSync();
+    toast(`Updated ${next.slug}`);
+    return;
   }
+
   const icon = formToIcon(null);
-  if (asCopy) { icon.name = icon.name + " copy"; icon.slug = icon.slug + "-copy"; icon.version = 1; }
-  if (icons.some(i => i.slug === icon.slug)) {
-    let n = 2, base = icon.slug;
-    while (icons.some(i => i.slug === base + "-" + n)) n++;
-    icon.slug = base + "-" + n;
+
+  /* Branching off an existing glyph: it has to be its own thing, not a
+     second entry wearing the same name. */
+  if (src && asNew) {
+    if (icon.slug === src.slug || norm(icon.name) === norm(src.name)) {
+      toast(`Rename it first — "${src.name}" is still the name of the glyph you started from`);
+      $("#f-name").focus(); $("#f-name").select();
+      return;
+    }
+    icon.version = 1;
   }
+
+  /* A duplicate slug would collide on export, so refuse rather than
+     silently renaming it behind your back. */
+  if (icons.some(i => i.slug === icon.slug)) {
+    toast(`The slug "${icon.slug}" is already taken`);
+    $("#f-slug").focus(); $("#f-slug").select();
+    return;
+  }
+
   icons.unshift(icon);
   editingId = icon.id;
   saveSet(); refreshAll(); scheduleSync();
-  toast(`Added ${icon.slug} to the set`);
+  toast(asNew ? `Saved ${icon.slug} as a new glyph` : `Added ${icon.slug} to the set`);
 }
 function loadIntoEditor(id) {
   const icon = icons.find(i => i.id === id);
@@ -1353,11 +1381,23 @@ $$("#status-chips .chip-btn").forEach(b => b.addEventListener("click", () => {
 /* ═══════════════════════════════════════════════════════════
    Import / export
    ═══════════════════════════════════════════════════════════ */
-$("#btn-export-menu").addEventListener("click", e => {
-  e.stopPropagation();
-  $("#export-menu").classList.toggle("is-open");
-});
-document.addEventListener("click", () => $("#export-menu").classList.remove("is-open"));
+function closeMenus(except) {
+  $$(".menu").forEach(m => { if (m !== except) m.classList.remove("is-open"); });
+}
+function bindMenu(buttonSel, menuSel) {
+  $(buttonSel).addEventListener("click", e => {
+    e.stopPropagation();
+    const menu = $(menuSel);
+    const opening = !menu.classList.contains("is-open");
+    closeMenus(menu);
+    menu.classList.toggle("is-open", opening);
+  });
+  $(menuSel).addEventListener("click", e => e.stopPropagation());
+}
+bindMenu("#btn-export-menu", "#export-menu");
+bindMenu("#btn-tips", "#tips-menu");
+document.addEventListener("click", () => closeMenus());
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenus(); });
 $("#export-menu").addEventListener("click", e => {
   const btn = e.target.closest("[data-export]");
   if (!btn) return;
