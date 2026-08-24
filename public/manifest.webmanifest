@@ -1,7 +1,7 @@
 {
-  "name": "Termina Studio",
+  "name": "Termina Icons",
   "short_name": "Termina",
-  "description": "Editor and drawer for the Termina 13×13 pixel icon set.",
+  "description": "A pixel icon set drawn on a 13 by 13 grid.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

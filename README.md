@@ -1,10 +1,14 @@
-# Termina Studio
+# Termina Icons
 
-Internal tool for drawing and cataloguing the Termina 13×13 pixel icon set.
+The public site for the Termina 13×13 pixel icon set, plus the studio it is
+drawn in. Both are the same file.
+
+`#/` is the landing page: hero, a short account of how the set is built,
+resources, and then the drawer. `#/editor` is the studio.
 
 ```
-public/index.html          the whole app — editor, drawer, export
-public/icon.svg            the app mark (drawn in the studio itself)
+public/index.html          the whole app — landing, drawer, editor, export
+public/icon.svg            the T mark (drawn in the studio itself)
 scripts/make-icons.mjs     regenerates the icon PNGs from that SVG
 netlify/functions/sync     private working set (passphrase-gated)
 netlify/functions/publish  cuts a public snapshot of the final glyphs
@@ -42,6 +46,9 @@ Local development, with Blobs and functions emulated:
 ```bash
 npx netlify-cli dev
 ```
+
+The site is served with `X-Robots-Tag: noindex, nofollow` from `netlify.toml`.
+Drop that header when the set is ready to be found.
 
 > If `TERMINA_KEY` is unset the API is **open** — anyone with the URL can read
 > and write the set. That is fine for `netlify dev`, never for production.
@@ -90,10 +97,12 @@ Or skip the build step entirely and reference the sprite:
 Publishing is explicit. Nothing becomes public until you mark a glyph final
 *and* click publish.
 
-## The app icon
+## The app icon and favicon
 
-`public/icon.svg` is the mark, exported straight from the studio. iOS and the
-web manifest need rasters, so redraw it there, replace that file, and run:
+`public/icon.svg` is the T mark, exported straight from the studio. It carries
+a `prefers-color-scheme` rule, so the tab icon is ink on a light browser and
+paper on a dark one. iOS and the web manifest need rasters, so redraw it there,
+replace that file, and run:
 
 ```bash
 node scripts/make-icons.mjs

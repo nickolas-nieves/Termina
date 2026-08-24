@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Termina Studio</title>
+<title>Termina Icons</title>
+<meta name="description" content="A pixel icon set drawn on a 13 by 13 grid and exported as SVG that inherits currentColor.">
 
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="application-name" content="Termina">
+<meta name="application-name" content="Termina Icons">
 <meta name="apple-mobile-web-app-title" content="Termina">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -171,7 +172,8 @@ a{color:inherit}
 .nav-logo:hover{background:var(--surface-2)}
 .nav-logo[aria-current="page"]{background:var(--surface-2)}
 
-.wordmark{justify-self:center;display:flex;align-items:center;user-select:none;color:var(--ink)}
+/* Half strength: on a public page the wordmark is a signature, not a control. */
+.wordmark{justify-self:center;display:flex;align-items:center;user-select:none;color:var(--ink);opacity:.5}
 .wordmark svg{display:block;height:13px;width:auto;fill:currentColor}
 
 .tab{
@@ -424,15 +426,128 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
 .pill-review{background:var(--pale-blue);color:var(--pale-blue-ink)}
 .pill-final{background:var(--pale-green);color:var(--pale-green-ink)}
 
+/* ── Landing ────────────────────────────────────────────── */
+/* Shares the drawer's 1360px measure so the hero, the facts and the glyph
+   grid all hang off the same left edge. */
+.landing{max-width:1360px;margin:0 auto;padding:0 32px}
+
+.hero{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;gap:72px;
+  padding:72px 0 78px;
+}
+.hero h1{
+  margin:0;font-family:var(--display);font-weight:700;
+  font-size:clamp(34px,4.6vw,56px);letter-spacing:-.045em;line-height:1.04;
+  max-width:16ch;
+}
+.hero-sub{margin:18px 0 0;color:var(--muted);font-size:16px;line-height:1.6;max-width:48ch}
+.hero-sub b{color:var(--ink-soft);font-weight:500;font-variant-numeric:tabular-nums}
+.hero-cta{display:flex;gap:10px;margin-top:30px;flex-wrap:wrap}
+.hero-cta .btn{height:38px;padding:0 18px;font-size:14px}
+
+/* The board is the argument: every glyph in the set is this same 13×13 field,
+   so the hero shows the grid instead of describing it. */
+.hero-board{
+  --hc:clamp(17px,2.3vw,26px);
+  display:grid;
+  grid-template-columns:repeat(13,var(--hc));
+  grid-template-rows:repeat(13,var(--hc));
+  flex:none;justify-self:end;
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  background:var(--surface);box-shadow:var(--shadow-2);
+}
+.hero-board i{
+  border-right:1px solid var(--line-soft);
+  border-bottom:1px solid var(--line-soft);
+  /* Delay rises along the diagonal, so a change reads as a sweep, not a blink. */
+  transition:background .42s var(--ease);
+  transition-delay:calc(var(--d,0) * 1ms);
+}
+.hero-board i:nth-child(13n){border-right:none}
+.hero-board i:nth-last-child(-n+13){border-bottom:none}
+.hero-board i.on{background:var(--ink)}
+
+.sec-head{padding:56px 0 20px}
+.sec-head h2{
+  margin:0;font-family:var(--display);font-weight:700;
+  font-size:26px;letter-spacing:-.035em;line-height:1.15;
+}
+.sec-head p{margin:7px 0 0;color:var(--muted);max-width:56ch}
+
+/* Four facts over two rows of three tracks: wide, narrow / narrow, wide. */
+.about{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.fact{
+  border:1px solid var(--line);border-radius:8px;background:var(--surface);
+  padding:22px;display:flex;flex-direction:column;gap:16px;min-width:0;
+}
+.fact.wide{grid-column:span 2}
+.fact.tint{background:var(--surface-2)}
+.fact h3{margin:0;font-size:14px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.fact p{margin:0;color:var(--muted);font-size:13px;line-height:1.55;max-width:52ch}
+.fact-vis{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fact-tile{
+  display:grid;place-items:center;width:54px;height:54px;flex:none;
+  border:1px solid var(--line);border-radius:6px;
+  background:var(--canvas);color:var(--ink);
+}
+.fact.tint .fact-tile{background:var(--surface)}
+.fact-tile.invert{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.fact-tile.sm{width:34px;height:34px}
+.fact-code{
+  margin:0;font-family:var(--mono);font-size:11px;line-height:1.65;
+  color:var(--muted);white-space:pre;overflow-x:auto;
+  padding:12px 13px;border:1px solid var(--line);border-radius:6px;background:var(--canvas);
+}
+.fact.tint .fact-code{background:var(--surface)}
+.fact-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fact-meta[hidden]{display:none}
+.fact-meta .fm-name{font-size:13px;color:var(--ink)}
+.fact-meta code{font-family:var(--mono);font-size:11px;color:var(--faint)}
+.fact-meta .fm-cat{
+  height:24px;display:inline-flex;align-items:center;padding:0 10px;
+  border:1px solid var(--line);border-radius:9999px;
+  font-size:11.5px;color:var(--muted);background:var(--surface);
+}
+
+.resources{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.res{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  width:100%;padding:22px;text-align:left;text-decoration:none;
+  border:1px solid var(--line);border-radius:8px;background:var(--surface);
+  transition:background .18s var(--ease),border-color .18s var(--ease),transform .12s var(--ease);
+}
+.res:hover{background:var(--surface-2);border-color:var(--line-strong)}
+.res:active{transform:scale(.995)}
+.res-body{display:block;min-width:0}
+.res-t{display:block;font-size:14px;font-weight:500;color:var(--ink)}
+.res-d{display:block;margin-top:5px;color:var(--muted);font-size:13px;line-height:1.5}
+.res-go{flex:none;color:var(--faint);transition:color .18s var(--ease),transform .18s var(--ease)}
+.res:hover .res-go{color:var(--ink);transform:translateX(2px)}
+
+.site-foot{border-top:1px solid var(--line);margin-top:72px}
+.foot-inner{
+  max-width:1360px;margin:0 auto;
+  padding:26px 32px calc(30px + var(--safe-bottom));
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.foot-mark{display:grid;place-items:center;color:var(--ink);opacity:.5}
+.foot-mark svg{display:block;height:16px;width:auto;fill:currentColor;shape-rendering:crispEdges}
+.foot-inner p{margin:0;color:var(--muted);font-size:12.5px}
+.foot-inner nav{margin-left:auto;display:flex;gap:18px}
+.foot-inner a{color:var(--muted);font-size:12.5px;text-decoration:none;transition:color .16s var(--ease)}
+.foot-inner a:hover{color:var(--ink)}
+
 /* ── Drawer ─────────────────────────────────────────────── */
 .drawer-head{
-  padding:44px 32px 22px;max-width:1360px;margin:0 auto;
+  padding:56px 32px 20px;max-width:1360px;margin:0 auto;
+  scroll-margin-top:var(--masthead);
 }
-.drawer-head h1{
-  margin:0;font-family:var(--display);font-weight:700;font-size:36px;
-  letter-spacing:-.035em;line-height:1.1;
+.drawer-head h2{
+  margin:0;font-family:var(--display);font-weight:700;font-size:26px;
+  letter-spacing:-.035em;line-height:1.15;
 }
-.drawer-head p{margin:8px 0 0;color:var(--muted);max-width:56ch}
+.drawer-head p{margin:7px 0 0;color:var(--muted);max-width:56ch}
 .filters{
   position:sticky;top:var(--masthead);z-index:30;
   background:var(--canvas-blur);
@@ -615,7 +730,16 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
 
 /* Tablets keep the two-column layout — the board just shrinks — so the editor
    still fits the window. Only phones stack, where scrolling is unavoidable. */
+@media (max-width:1040px){
+  .hero{gap:44px}
+}
+
 @media (max-width:900px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:38px;padding:52px 0 58px}
+  .hero-board{justify-self:start}
+  /* Two tracks, so a `wide` fact still fills exactly one row and no cell is
+     left blank at the end of the grid. */
+  .about{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sidebar{width:296px}
   .studio{grid-template-columns:minmax(0,1fr) 296px}
   .side-head{padding:16px 18px 13px}
@@ -628,6 +752,9 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
 /* Below this the three action clusters stop fitting side by side, so the
    centred wordmark and the sync label are the first things to go. */
 @media (max-width:660px){
+  .about,.resources{grid-template-columns:minmax(0,1fr)}
+  .fact.wide{grid-column:span 1}
+  .foot-inner nav{margin-left:0;width:100%}
   .masthead{grid-template-columns:auto 1fr;gap:8px}
   .wordmark{display:none}
   .masthead-actions{grid-column:2}
@@ -641,7 +768,14 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
   .sidebar,.studio .sidebar{width:auto;height:auto;border-left:none;border-top:1px solid var(--line)}
   .stage{overflow:visible;padding:22px 16px 26px}
   .masthead{padding-inline:14px;gap:12px}
-  .drawer-head,.filters-inner,.grid-wrap{padding-left:18px;padding-right:18px}
+  .drawer-head,.filters-inner,.grid-wrap,.landing,.foot-inner{padding-left:18px;padding-right:18px}
+}
+
+/* The board reel and the card cascade are decoration; both hold their final
+   frame when the reader has asked for stillness. */
+@media (prefers-reduced-motion:reduce){
+  .hero-board i{transition:none}
+  .card{animation:none;opacity:1;transform:none}
 }
 
 /* Very short windows: drop the preview strip rather than squeeze the grid
@@ -659,8 +793,8 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
 
 <header class="masthead">
   <nav class="nav-left" aria-label="Primary">
-    <a class="nav-logo" id="nav-drawer" href="#/drawer" data-route="drawer" title="Icon drawer">
-      <svg viewBox="11.6 7.06 81.8 90.88" aria-hidden="true"><rect x="11.6" y="7.06" width="9.09" height="9.09"/><rect x="29.78" y="7.06" width="9.09" height="9.09"/><rect x="47.96" y="7.06" width="9.09" height="9.09"/><rect x="66.13" y="7.06" width="9.09" height="9.09"/><rect x="84.31" y="7.06" width="9.09" height="9.09"/><rect x="20.69" y="16.15" width="9.09" height="9.09"/><rect x="38.87" y="16.15" width="9.09" height="9.09"/><rect x="57.04" y="16.15" width="9.09" height="9.09"/><rect x="75.22" y="16.15" width="9.09" height="9.09"/><rect x="11.6" y="25.24" width="9.09" height="9.09"/><rect x="29.78" y="25.24" width="9.09" height="9.09"/><rect x="47.96" y="25.24" width="9.09" height="9.09"/><rect x="66.13" y="25.24" width="9.09" height="9.09"/><rect x="84.31" y="25.24" width="9.09" height="9.09"/><rect x="38.87" y="34.32" width="9.09" height="9.09"/><rect x="57.04" y="34.32" width="9.09" height="9.09"/><rect x="47.96" y="43.41" width="9.09" height="9.09"/><rect x="38.87" y="52.5" width="9.09" height="9.09"/><rect x="57.04" y="52.5" width="9.09" height="9.09"/><rect x="47.96" y="61.59" width="9.09" height="9.09"/><rect x="38.87" y="70.68" width="9.09" height="9.09"/><rect x="57.04" y="70.68" width="9.09" height="9.09"/><rect x="47.96" y="79.76" width="9.09" height="9.09"/><rect x="38.87" y="88.85" width="9.09" height="9.09"/><rect x="57.04" y="88.85" width="9.09" height="9.09"/></svg><span class="sr-only">Icon drawer</span>
+    <a class="nav-logo" id="nav-drawer" href="#/" data-route="drawer" title="Termina Icons">
+      <svg viewBox="11.6 7.06 81.8 90.88" aria-hidden="true"><rect x="11.6" y="7.06" width="9.09" height="9.09"/><rect x="29.78" y="7.06" width="9.09" height="9.09"/><rect x="47.96" y="7.06" width="9.09" height="9.09"/><rect x="66.13" y="7.06" width="9.09" height="9.09"/><rect x="84.31" y="7.06" width="9.09" height="9.09"/><rect x="20.69" y="16.15" width="9.09" height="9.09"/><rect x="38.87" y="16.15" width="9.09" height="9.09"/><rect x="57.04" y="16.15" width="9.09" height="9.09"/><rect x="75.22" y="16.15" width="9.09" height="9.09"/><rect x="11.6" y="25.24" width="9.09" height="9.09"/><rect x="29.78" y="25.24" width="9.09" height="9.09"/><rect x="47.96" y="25.24" width="9.09" height="9.09"/><rect x="66.13" y="25.24" width="9.09" height="9.09"/><rect x="84.31" y="25.24" width="9.09" height="9.09"/><rect x="38.87" y="34.32" width="9.09" height="9.09"/><rect x="57.04" y="34.32" width="9.09" height="9.09"/><rect x="47.96" y="43.41" width="9.09" height="9.09"/><rect x="38.87" y="52.5" width="9.09" height="9.09"/><rect x="57.04" y="52.5" width="9.09" height="9.09"/><rect x="47.96" y="61.59" width="9.09" height="9.09"/><rect x="38.87" y="70.68" width="9.09" height="9.09"/><rect x="57.04" y="70.68" width="9.09" height="9.09"/><rect x="47.96" y="79.76" width="9.09" height="9.09"/><rect x="38.87" y="88.85" width="9.09" height="9.09"/><rect x="57.04" y="88.85" width="9.09" height="9.09"/></svg><span class="sr-only">Termina Icons</span>
     </a>
     <a class="tab" href="#/editor" data-route="editor">Editor</a>
   </nav>
@@ -850,8 +984,86 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
 
 <!-- ══════════════════ DRAWER ══════════════════ -->
 <main class="view" id="view-drawer">
-  <div class="drawer-head">
-    <h1>Icon drawer</h1>
+<!-- ══════════════════ LANDING ══════════════════ -->
+<div class="landing">
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Icons drawn one pixel at a time.</h1>
+      <p class="hero-sub" id="hero-sub">Every glyph lives on the same 13 by 13 grid and exports as SVG that inherits currentColor.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" id="cta-browse">Browse the set</button>
+        <button class="btn" data-export="svgzip">Download SVGs</button>
+      </div>
+    </div>
+    <!-- Decorative: the reel says the same thing the copy already says. -->
+    <div class="hero-board" id="hero-board" aria-hidden="true"></div>
+  </section>
+
+  <div class="sec-head">
+    <h2>How the set is built</h2>
+    <p>One grid, one export path, and enough metadata to find a glyph six months from now.</p>
+  </div>
+
+  <section class="about">
+    <article class="fact wide">
+      <div class="fact-vis" id="fact-glyphs"></div>
+      <div>
+        <h3>One grid, no exceptions</h3>
+        <p>Every glyph occupies the same 169 cells. Nothing sits half a pixel off, so weight and rhythm stay even across the whole set.</p>
+      </div>
+    </article>
+
+    <article class="fact tint">
+      <pre class="fact-code"><code>&lt;svg viewBox="0 0 13 13"
+     shape-rendering="crispEdges"
+     fill="currentColor"&gt;</code></pre>
+      <div>
+        <h3>Sharp SVG, small files</h3>
+        <p>Runs of pixels merge into single rects. No paths to simplify, no strokes that drift when you scale them.</p>
+      </div>
+    </article>
+
+    <article class="fact tint">
+      <div class="fact-vis" id="fact-color"></div>
+      <div>
+        <h3>Takes your text color</h3>
+        <p>Glyphs fill with currentColor, so one file covers light and dark without a second asset.</p>
+      </div>
+    </article>
+
+    <article class="fact wide">
+      <div class="fact-meta" id="fact-meta" hidden></div>
+      <div>
+        <h3>Named, slugged, filed</h3>
+        <p>Each glyph carries a name, a stable slug, a category and keywords, so search finds it by whatever you happen to call it.</p>
+      </div>
+    </article>
+  </section>
+
+  <div class="sec-head">
+    <h2>Resources</h2>
+  </div>
+
+  <section class="resources">
+    <button class="res" data-export="svgzip">
+      <span class="res-body">
+        <span class="res-t">Download SVGs</span>
+        <span class="res-d">Every glyph as its own file, plus the JSON manifest, in one zip.</span>
+      </span>
+      <svg class="res-go" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.5v9M4.5 8l3.5 3.5L11.5 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+    </button>
+    <a class="res" href="https://github.com/nickolas-nieves/Termina" target="_blank" rel="noopener noreferrer">
+      <span class="res-body">
+        <span class="res-t">Source on GitHub</span>
+        <span class="res-d">The studio the set is drawn in, the export code, and the glyph format.</span>
+      </span>
+      <svg class="res-go" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5.5 10.5l5-5M6.5 5.5h4v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/></svg>
+    </a>
+  </section>
+</div>
+
+  <div class="drawer-head" id="drawer-head">
+    <h2>Icon drawer</h2>
     <p id="drawer-sub">Every glyph in the Termina set. Search by name, slug, keyword, or category.</p>
   </div>
 
@@ -875,6 +1087,17 @@ textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:58px;line
   <div class="grid-wrap">
     <div class="icon-grid" id="icon-grid"></div>
   </div>
+
+<footer class="site-foot">
+  <div class="foot-inner">
+    <span class="foot-mark" role="img" aria-label="Termina"><svg viewBox="11.6 7.06 81.8 90.88" aria-hidden="true"><rect x="11.6" y="7.06" width="9.09" height="9.09"/><rect x="29.78" y="7.06" width="9.09" height="9.09"/><rect x="47.96" y="7.06" width="9.09" height="9.09"/><rect x="66.13" y="7.06" width="9.09" height="9.09"/><rect x="84.31" y="7.06" width="9.09" height="9.09"/><rect x="20.69" y="16.15" width="9.09" height="9.09"/><rect x="38.87" y="16.15" width="9.09" height="9.09"/><rect x="57.04" y="16.15" width="9.09" height="9.09"/><rect x="75.22" y="16.15" width="9.09" height="9.09"/><rect x="11.6" y="25.24" width="9.09" height="9.09"/><rect x="29.78" y="25.24" width="9.09" height="9.09"/><rect x="47.96" y="25.24" width="9.09" height="9.09"/><rect x="66.13" y="25.24" width="9.09" height="9.09"/><rect x="84.31" y="25.24" width="9.09" height="9.09"/><rect x="38.87" y="34.32" width="9.09" height="9.09"/><rect x="57.04" y="34.32" width="9.09" height="9.09"/><rect x="47.96" y="43.41" width="9.09" height="9.09"/><rect x="38.87" y="52.5" width="9.09" height="9.09"/><rect x="57.04" y="52.5" width="9.09" height="9.09"/><rect x="47.96" y="61.59" width="9.09" height="9.09"/><rect x="38.87" y="70.68" width="9.09" height="9.09"/><rect x="57.04" y="70.68" width="9.09" height="9.09"/><rect x="47.96" y="79.76" width="9.09" height="9.09"/><rect x="38.87" y="88.85" width="9.09" height="9.09"/><rect x="57.04" y="88.85" width="9.09" height="9.09"/></svg></span>
+    <p>Termina Icons. Released under the MIT license.</p>
+    <nav aria-label="Footer">
+      <a href="https://github.com/nickolas-nieves/Termina" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="#/editor">Editor</a>
+    </nav>
+  </div>
+</footer>
 </main>
 
 <input type="file" id="file-input" accept="application/json,.json" hidden>
@@ -1928,6 +2151,125 @@ $("#btn-theme").addEventListener("click", () => {
 });
 
 /* ═══════════════════════════════════════════════════════════
+   Landing
+   ═══════════════════════════════════════════════════════════ */
+/* The T mark, drawn on the same 13×13 grid as every glyph in the set. It is
+   the first frame of the hero reel, so the board opens on something known. */
+const MARK_BITS =
+  "0000000000000" +
+  "0000000000000" +
+  "0010101010100" +
+  "0001010101000" +
+  "0010101010100" +
+  "0000010100000" +
+  "0000001000000" +
+  "0000010100000" +
+  "0000001000000" +
+  "0000010100000" +
+  "0000001000000" +
+  "0000010100000" +
+  "0000000000000";
+
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+/* One <i> per cell, built once. Each carries its own transition delay, so a
+   repaint travels across the board on the diagonal instead of flipping at once. */
+const heroCells = (() => {
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < CELLS; i++) {
+    const cell = document.createElement("i");
+    cell.style.setProperty("--d", String(((i % N) + Math.floor(i / N)) * 16));
+    frag.appendChild(cell);
+  }
+  $("#hero-board").appendChild(frag);
+  return Array.from($("#hero-board").children);
+})();
+
+function paintHeroBoard(bits) {
+  for (let i = 0; i < CELLS; i++) heroCells[i].classList.toggle("on", bits[i] === "1");
+}
+
+let heroTimer = null, heroKey = "";
+function stopHeroReel() { clearInterval(heroTimer); heroTimer = null; }
+/**
+ * A background sync calls refreshAll every 90 seconds. Restarting the reel on
+ * each of those would snap the board back to the mark mid-cycle, so an
+ * unchanged set leaves the running timer alone.
+ */
+function startHeroReel(force) {
+  // The mark, then a slice of the real set: the point of the reel is that all
+  // of them are the same field of cells.
+  const reel = [MARK_BITS].concat(
+    icons.filter(i => i.pixels && i.pixels !== MARK_BITS).slice(0, 14).map(i => i.pixels)
+  );
+  const key = reel.join("|");
+  if (!force && key === heroKey && heroTimer) return;
+  heroKey = key;
+  stopHeroReel();
+  paintHeroBoard(reel[0]);
+  if (reduceMotion.matches || reel.length < 2) return;
+  let at = 0;
+  heroTimer = setInterval(() => {
+    if (document.hidden) return;               // no repaints behind a hidden tab
+    at = (at + 1) % reel.length;
+    paintHeroBoard(reel[at]);
+  }, 2600);
+}
+
+function renderHero() {
+  const n = icons.length;
+  $("#hero-sub").innerHTML = n
+    ? `<b>${n}</b> glyph${n === 1 ? "" : "s"}, all on the same 13 by 13 grid, exported as SVG that inherits currentColor.`
+    : "Every glyph lives on the same 13 by 13 grid and exports as SVG that inherits currentColor.";
+  renderFacts();
+  startHeroReel();
+}
+
+/* The fact tiles show real glyphs rather than mock-ups. With an empty set they
+   fall back to the mark, and the metadata row hides rather than inventing one. */
+function renderFacts() {
+  const drawn = icons.filter(i => i.pixels);
+  const tile = (bits, cls, label) =>
+    `<span class="fact-tile${cls ? " " + cls : ""}"${label ? ` title="${escapeHTML(label)}"` : ""}>` +
+    `${glyphSVG(bits, 26)}</span>`;
+
+  const strip = drawn.slice(0, 5);
+  $("#fact-glyphs").innerHTML = strip.length
+    ? strip.map(i => tile(i.pixels, "", i.name || "")).join("")
+    : tile(MARK_BITS, "", "Termina");
+
+  const one = drawn[0] ? drawn[0].pixels : MARK_BITS;
+  $("#fact-color").innerHTML = tile(one) + tile(one, "invert");
+
+  const meta = $("#fact-meta");
+  const m = drawn[0];
+  meta.hidden = !m;
+  if (!m) return;
+  meta.innerHTML =
+    `<span class="fact-tile sm">${glyphSVG(m.pixels, 18)}</span>` +
+    `<span class="fm-name">${escapeHTML(m.name || "Untitled")}</span>` +
+    `<code>${escapeHTML(m.slug || "")}</code>` +
+    (m.category ? `<span class="fm-cat">${escapeHTML(m.category)}</span>` : "");
+}
+
+// Flipping the OS motion setting should settle the board without a reload.
+reduceMotion.addEventListener("change", () => startHeroReel(true));
+
+$("#cta-browse").addEventListener("click", () => {
+  $("#drawer-head").scrollIntoView({
+    behavior: reduceMotion.matches ? "auto" : "smooth",
+    block: "start"
+  });
+});
+
+// The export menu's own handler is scoped to that menu, so the landing's two
+// download affordances need their own.
+$(".landing").addEventListener("click", e => {
+  const btn = e.target.closest("[data-export]");
+  if (btn) doExport(btn.dataset.export);
+});
+
+/* ═══════════════════════════════════════════════════════════
    Routing
    ═══════════════════════════════════════════════════════════ */
 function goto(route) {
@@ -1935,14 +2277,15 @@ function goto(route) {
   else applyRoute();
 }
 function applyRoute() {
-  const route = (location.hash.replace("#/", "") || "editor") === "drawer" ? "drawer" : "editor";
+  const route = location.hash.replace("#/", "") === "editor" ? "editor" : "drawer";
   $("#view-editor").classList.toggle("is-active", route === "editor");
   $("#view-drawer").classList.toggle("is-active", route === "drawer");
   $$("[data-route]").forEach(t => {
     if (t.dataset.route === route) t.setAttribute("aria-current", "page");
     else t.removeAttribute("aria-current");
   });
-  if (route === "drawer") { renderCategoryChips(); renderDrawer(); }
+  if (route === "drawer") { renderCategoryChips(); renderDrawer(); renderHero(); }
+  else stopHeroReel();
   window.scrollTo(0, 0);
 }
 window.addEventListener("hashchange", applyRoute);
@@ -2185,6 +2528,7 @@ function refreshAll() {
   renderSideHead();
   renderCategoryChips();
   renderDrawer();
+  if ($("#view-drawer").classList.contains("is-active")) renderHero();
 }
 (function init() {
   applyTheme(storedTheme());
