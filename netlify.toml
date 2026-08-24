@@ -31,3 +31,10 @@
   for = "/icon.svg"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+
+# The font file is inert — rename it if it is ever regenerated, since nothing
+# here busts the cache.
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
