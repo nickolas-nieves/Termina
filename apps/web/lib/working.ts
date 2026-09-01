@@ -1,5 +1,5 @@
 import "server-only";
-import { normalizeIcon, publicIcon, type Icon, type PublicIcon } from "@termina/glyph";
+import { normalizeIcon, publicIcon, type Icon, type PublicIcon, type Status } from "@termina/glyph";
 import { store } from "./store";
 import { publishedIcons } from "./published";
 
@@ -74,6 +74,42 @@ export class SlugTakenError extends Error {
     super(`The slug "${slug}" is already in use.`);
     this.name = "SlugTakenError";
   }
+}
+
+/**
+ * Set the status of many working glyphs at once.
+ *
+ * One read-modify-write for the whole batch. Doing this per glyph would be
+ * hundreds of round trips against a single shared document, and any two of
+ * them overlapping would lose writes.
+ *
+ * Published entries carry a synthetic id and have no working record, so they
+ * are counted as skipped rather than silently having one invented for them —
+ * a glyph that is already live does not have a draft status to change.
+ */
+export async function bulkSetStatus(
+  ids: string[],
+  status: Status
+): Promise<{ updated: number; skipped: number }> {
+  const doc = await readWorking();
+  const now = new Date().toISOString();
+  let updated = 0;
+  let skipped = 0;
+
+  for (const id of ids) {
+    const icon = doc.icons[id];
+    if (!icon) {
+      skipped++;
+      continue;
+    }
+    if (icon.status !== status) {
+      doc.icons[id] = { ...icon, status, updatedAt: now };
+    }
+    updated++;
+  }
+
+  if (updated) await writeWorking(doc);
+  return { updated, skipped };
 }
 
 export async function deleteWorkingIcon(id: string): Promise<boolean> {
@@ -170,15 +206,31 @@ export interface PublishPlan {
   next: PublicIcon[];
   /** Working glyphs held back because they are not marked final. */
   held: Icon[];
+  /** True when the plan covers a chosen subset rather than the whole set. */
+  scoped: boolean;
+  /**
+   * Staged removals a scoped publish leaves alone. Removals are staged against
+   * published glyphs, which are not selectable, so scoping to a selection
+   * cannot mean anything for them — the dialog says so rather than quietly
+   * dropping them.
+   */
+  excludedRemovals: number;
 }
 
 /**
  * Work out exactly what a publish would change. The console shows this before
  * anything is committed — publishing should never be a surprise.
+ *
+ * Pass `ids` to scope the plan to a chosen subset of the working set. The
+ * resulting `next` is still the whole manifest, just with only those glyphs
+ * applied to it.
  */
-export async function planPublish(): Promise<PublishPlan> {
+export async function planPublish(opts: { ids?: string[] } = {}): Promise<PublishPlan> {
   const doc = await readWorking();
-  const working = Object.values(doc.icons);
+  const scope = opts.ids ? new Set(opts.ids) : null;
+
+  const everything = Object.values(doc.icons);
+  const working = scope ? everything.filter((i) => scope.has(i.id)) : everything;
   const finals = working.filter((i) => i.status === "final");
   const held = working.filter((i) => i.status !== "final");
 
@@ -192,9 +244,10 @@ export async function planPublish(): Promise<PublishPlan> {
     else if (differs(icon, live)) modified.push(publicIcon(icon));
   }
 
-  const removed = doc.removed.filter(
+  const stagedRemovals = doc.removed.filter(
     (slug) => liveBySlug.has(slug) && !finals.some((i) => i.slug === slug)
   );
+  const removed = scope ? [] : stagedRemovals;
 
   const next = new Map(publishedIcons.map((i) => [i.slug, i]));
   for (const icon of [...added, ...modified]) next.set(icon.slug, icon);
@@ -206,6 +259,8 @@ export async function planPublish(): Promise<PublishPlan> {
     removed,
     next: [...next.values()].sort((a, b) => a.slug.localeCompare(b.slug)),
     held,
+    scoped: scope !== null,
+    excludedRemovals: scope ? stagedRemovals.length : 0,
   };
 }
 

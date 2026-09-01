@@ -132,11 +132,24 @@ Functions behind a shared passphrase. To bring an existing set across, export it
 from the old app (**Export → Set as JSON**) and run:
 
 ```bash
+npm run icons:import -- ~/Downloads/termina-iconset.json --dry-run   # look first
 npm run icons:import -- ~/Downloads/termina-iconset.json
 ```
 
-Glyphs marked `final` go into `icons/`; drafts land in the local working set.
-Pass `--all` to publish everything regardless of status.
+Glyphs marked `final` go into `icons/`; everything else lands in the local
+working set, where the admin console picks it up at `/admin`.
+
+| Flag | Effect |
+| --- | --- |
+| `--dry-run` | Report what would happen, write nothing |
+| `--all` | Publish every glyph into `icons/`, whatever its status |
+| `--status=final` | Force a status on everything imported |
+
+The old studio only ever marked a glyph `final` at publish time, so an export
+is usually all drafts. If you want the whole set live immediately, combine
+them: `--all` publishes straight into `icons/`, and a commit puts it on the
+site. Re-running an import matches on slug, so it updates rather than
+duplicating.
 
 ## Documentation
 

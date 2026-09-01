@@ -44,6 +44,11 @@ npm run dev
 That's the whole setup — the site runs with no accounts, keys or services. Local
 data goes into `.data/`, which is gitignored.
 
+Don't run `npm run build` while `npm run dev` is going — they share
+`apps/web/.next`, and the production build replaces the chunks the dev server
+has open. It fails with `Cannot find module './NNN.js'`. Stop the dev server
+first, or `rm -rf apps/web/.next` and restart it.
+
 Before opening a pull request:
 
 ```bash

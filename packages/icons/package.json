@@ -48,7 +48,7 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
-    "typecheck": "tsc --noEmit dist/index.d.ts dist/react.d.ts",
+    "typecheck": "node scripts/build.mjs && tsc --noEmit dist/index.d.ts dist/react.d.ts",
     "prepublishOnly": "node scripts/build.mjs && node scripts/verify.mjs"
   },
   "peerDependencies": {

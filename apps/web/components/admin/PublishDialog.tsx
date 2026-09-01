@@ -13,6 +13,9 @@ interface Plan {
   branch: string | null;
   head: string | null;
   repoError: string | null;
+  scoped: boolean;
+  excludedRemovals: number;
+  nextCount: number;
   added: PublicIcon[];
   modified: PublicIcon[];
   removed: string[];
@@ -27,28 +30,38 @@ export function PublishDialog({
   open,
   onClose,
   onPublished,
+  ids,
 }: {
   open: boolean;
   onClose: () => void;
   onPublished: () => void;
+  /** Publish only these working glyphs. Omitted publishes everything ready. */
+  ids?: string[];
 }) {
   const toast = useToast();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Serialised so a changing array identity does not refetch on every render.
+  const scopeKey = ids ? ids.join(",") : "";
+
   useEffect(() => {
     if (!open) return;
     setPlan(null);
     setError(null);
-    fetch("/api/admin/publish")
+    fetch("/api/admin/publish/plan", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(scopeKey ? { ids: scopeKey.split(",") } : {}),
+    })
       .then((r) => r.json())
       .then((body: Plan & { error?: string }) => {
         if (body.error) setError(body.error);
         else setPlan(body);
       })
       .catch(() => setError("Could not work out what would change."));
-  }, [open]);
+  }, [open, scopeKey]);
 
   const total = plan ? plan.added.length + plan.modified.length + plan.removed.length : 0;
 
@@ -60,7 +73,10 @@ export function PublishDialog({
       const res = await fetch("/api/admin/publish", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ expectedHead: plan.head }),
+        body: JSON.stringify({
+          expectedHead: plan.head,
+          ...(scopeKey ? { ids: scopeKey.split(",") } : {}),
+        }),
       });
       const body = (await res.json()) as {
         error?: string;
@@ -83,7 +99,9 @@ export function PublishDialog({
 
   return (
     <Dialog open={open} onClose={onClose} labelledBy="publish-title" wide>
-      <h3 id="publish-title">Publish to the repository</h3>
+      <h3 id="publish-title">
+        {ids?.length ? `Publish ${ids.length} selected` : "Publish to the repository"}
+      </h3>
 
       {!plan && !error ? (
         <p>Working out what would change…</p>
@@ -96,14 +114,23 @@ export function PublishDialog({
         <>
           <p>
             {total === 0 ? (
-              <>Nothing to publish — the repository already matches the working set.</>
+              plan.scoped ? (
+                <>
+                  Nothing to publish in that selection — those glyphs are either unchanged or not
+                  marked final.
+                </>
+              ) : (
+                <>Nothing to publish — the repository already matches the working set.</>
+              )
             ) : plan.configured ? (
               <>
                 This commits {total} change{total === 1 ? "" : "s"} to{" "}
                 <code>
                   {plan.repo}@{plan.branch}
                 </code>{" "}
-                as you. The public site rebuilds from that commit.
+                as you. The set will hold {plan.nextCount} glyph
+                {plan.nextCount === 1 ? "" : "s"} afterwards, and the public site rebuilds from
+                that commit.
               </>
             ) : (
               <>
@@ -157,11 +184,23 @@ export function PublishDialog({
             </ul>
           ) : null}
 
+          {plan.scoped && plan.excludedRemovals ? (
+            <div className="notice notice-info" style={{ marginTop: 16 }}>
+              <span>
+                {plan.excludedRemovals} staged removal
+                {plan.excludedRemovals === 1 ? " is" : "s are"} not part of this publish. Removals
+                apply to published glyphs, which cannot be selected — publish the whole set to
+                apply them.
+              </span>
+            </div>
+          ) : null}
+
           {plan.held.length ? (
             <div className="notice notice-warn" style={{ marginTop: 16 }}>
               <Warn />
               <span>
-                {plan.held.length} glyph{plan.held.length === 1 ? "" : "s"} held back —{" "}
+                {plan.held.length}{plan.scoped ? " of the selected" : ""} glyph
+                {plan.held.length === 1 ? "" : "s"} held back —{" "}
                 {plan.held
                   .slice(0, 4)
                   .map((h) => h.slug)
@@ -191,7 +230,7 @@ export function PublishDialog({
           className="btn btn-primary"
           type="button"
           onClick={publish}
-          disabled={busy || !plan || total === 0 || !plan.configured}
+          disabled={busy || !plan || total === 0 || !plan.configured || Boolean(plan.repoError)}
         >
           {busy ? "Publishing…" : total ? `Publish ${total} change${total === 1 ? "" : "s"}` : "Publish"}
         </button>

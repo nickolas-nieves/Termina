@@ -2,28 +2,35 @@
 /**
  * Import a `termina-iconset.json` exported from the old single-file studio.
  *
- *   npm run icons:import -- ~/Downloads/termina-iconset.json
- *   npm run icons:import -- ~/Downloads/termina-iconset.json --all
+ *   npm run icons:import -- <file>                 # final → published, rest → working set
+ *   npm run icons:import -- <file> --all           # publish everything, whatever its status
+ *   npm run icons:import -- <file> --status=final  # force a status on everything imported
+ *   npm run icons:import -- <file> --dry-run       # report only, write nothing
  *
- * By default only glyphs marked `final` are published into `icons/`, which
- * mirrors what the old Publish button did. Everything else — drafts and
- * glyphs still in review — is written to `.data/working.json` so it lands in
- * the admin console's working set instead of the public set.
+ * By default only glyphs marked `final` are published into `icons/`, mirroring
+ * what the old Publish button did. Everything else goes into the local working
+ * set, where the admin console picks it up.
  *
  * Existing glyphs are matched by slug and overwritten; nothing is deleted.
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
-import { normalizeIcon, isValidPixels } from "../packages/glyph/index.js";
+import { dirname } from "node:path";
+import { STATUSES, normalizeIcon, isValidPixels, countOn } from "../packages/glyph/index.js";
 import { readManifest, writeManifest } from "./lib/manifest.mjs";
-import { ROOT } from "./lib/paths.mjs";
+import { workingFile } from "./lib/store-path.mjs";
 
 const args = process.argv.slice(2);
 const all = args.includes("--all");
+const dryRun = args.includes("--dry-run");
+const statusArg = args.find((a) => a.startsWith("--status="))?.split("=")[1];
 const file = args.find((a) => !a.startsWith("--"));
 
 if (!file) {
-  console.error("Usage: npm run icons:import -- <termina-iconset.json> [--all]");
+  console.error("Usage: npm run icons:import -- <termina-iconset.json> [--all] [--status=draft|review|final] [--dry-run]");
+  process.exit(1);
+}
+if (statusArg && !STATUSES.includes(statusArg)) {
+  console.error(`--status must be one of: ${STATUSES.join(", ")}`);
   process.exit(1);
 }
 
@@ -35,9 +42,14 @@ try {
   process.exit(1);
 }
 
-const incoming = (Array.isArray(raw) ? raw : raw.icons || [])
+const source = Array.isArray(raw) ? raw : raw.icons || [];
+const incoming = source
   .map((i) => normalizeIcon(i))
-  .filter((i) => i && isValidPixels(i.pixels));
+  .filter((i) => i && isValidPixels(i.pixels))
+  .map((i) => (statusArg ? { ...i, status: statusArg } : i));
+
+const skipped = source.length - incoming.length;
+const blank = incoming.filter((i) => countOn(i.pixels) === 0);
 
 if (!incoming.length) {
   console.error("No usable glyphs in that file.");
@@ -47,32 +59,74 @@ if (!incoming.length) {
 const publishable = all ? incoming : incoming.filter((i) => i.status === "final");
 const held = incoming.filter((i) => !publishable.includes(i));
 
-/* ── into the public set ── */
-const doc = readManifest();
-const bySlug = new Map(doc.icons.map((i) => [i.slug, i]));
-let added = 0, replaced = 0;
+/* A duplicate slug would collide on export, so report rather than silently
+   letting the last one win. */
+const seen = new Map();
 for (const icon of publishable) {
-  if (bySlug.has(icon.slug)) replaced++; else added++;
-  bySlug.set(icon.slug, icon);
-}
-const out = writeManifest([...bySlug.values()]);
-
-/* ── the rest into the local working set ── */
-if (held.length) {
-  const dir = join(ROOT, ".data");
-  mkdirSync(dir, { recursive: true });
-  const path = join(dir, "working.json");
-  let working = { icons: {}, updatedAt: null };
-  try { working = JSON.parse(readFileSync(path, "utf8")); } catch { /* first run */ }
-  working.icons ||= {};
-  for (const icon of held) working.icons[icon.id] = icon;
-  working.updatedAt = new Date().toISOString();
-  writeFileSync(path, JSON.stringify(working, null, 2) + "\n");
+  if (seen.has(icon.slug)) {
+    console.error(`Duplicate slug in the import: "${icon.slug}" appears more than once.`);
+    process.exit(1);
+  }
+  seen.set(icon.slug, icon);
 }
 
-console.log(`Published set: ${added} added, ${replaced} replaced — ${out.count} total.`);
-if (held.length) {
-  console.log(`Working set:   ${held.length} draft/review glyph${held.length === 1 ? "" : "s"} written to .data/working.json`);
-  console.log(`               (local dev only — re-import there or redraw them once you are signed in)`);
+if (dryRun) {
+  console.log(`Dry run — nothing written.\n`);
+  console.log(`  Readable glyphs   ${incoming.length}${skipped ? ` (${skipped} skipped as malformed)` : ""}`);
+  console.log(`  Would publish     ${publishable.length}  → icons/`);
+  console.log(`  Would hold        ${held.length}  → working set`);
+  if (blank.length) console.log(`  Blank glyphs      ${blank.length}`);
+  const byStatus = {};
+  for (const i of incoming) byStatus[i.status] = (byStatus[i.status] ?? 0) + 1;
+  console.log(`  By status         ${JSON.stringify(byStatus)}`);
+  process.exit(0);
 }
-console.log(`\nNext: npm run icons:check && git add icons && git commit -m "Import the existing set"`);
+
+/* ── into the published set (git) ── */
+let published = 0;
+if (publishable.length) {
+  const doc = readManifest();
+  const bySlug = new Map(doc.icons.map((i) => [i.slug, i]));
+  for (const icon of publishable) bySlug.set(icon.slug, icon);
+  published = writeManifest([...bySlug.values()]).count;
+}
+
+/* ── the rest into the working set ──
+   Written through the same layout apps/web/lib/store.ts uses, so the admin
+   console actually finds them. */
+if (held.length) {
+  const path = workingFile();
+  mkdirSync(dirname(path), { recursive: true });
+
+  let doc = { icons: {}, removed: [], updatedAt: null };
+  try {
+    doc = JSON.parse(readFileSync(path, "utf8"));
+  } catch {
+    /* first import */
+  }
+  doc.icons ||= {};
+  doc.removed ||= [];
+
+  // Match on slug so re-running an import updates rather than duplicating.
+  const bySlug = new Map(Object.entries(doc.icons).map(([id, i]) => [i.slug, id]));
+  for (const icon of held) {
+    const existingId = bySlug.get(icon.slug);
+    if (existingId) delete doc.icons[existingId];
+    doc.icons[icon.id] = icon;
+  }
+  doc.updatedAt = new Date().toISOString();
+
+  writeFileSync(path, JSON.stringify(doc, null, 2) + "\n");
+}
+
+if (skipped) console.log(`Skipped ${skipped} entr${skipped === 1 ? "y" : "ies"} that were not readable glyphs.`);
+if (blank.length) console.log(`Note: ${blank.length} imported glyph${blank.length === 1 ? " is" : "s are"} blank.`);
+
+if (publishable.length) {
+  console.log(`Published set: ${publishable.length} imported — ${published} total in icons/.`);
+}
+if (held.length) {
+  console.log(`Working set:   ${held.length} glyph${held.length === 1 ? "" : "s"} written to ${workingFile().replace(process.cwd() + "/", "")}`);
+  console.log(`               Visible in the admin console at /admin when running locally.`);
+}
+console.log(`\nNext: npm run icons:check${publishable.length ? ` && git add icons && git commit -m "Import the existing set"` : ""}`);

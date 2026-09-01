@@ -24,6 +24,12 @@ export interface RepoTarget {
   branch: string;
 }
 
+/** The repository scope to request at sign-in. Least privilege by default. */
+export function oauthScope(): string {
+  const configured = process.env.GITHUB_OAUTH_SCOPE?.trim();
+  return configured === "repo" ? "repo" : "public_repo";
+}
+
 export function repoTarget(): RepoTarget | null {
   const slug = process.env.GITHUB_REPO;
   if (!slug) return null;
@@ -39,10 +45,12 @@ export function authorizeUrl(state: string, redirectUri: string): string {
   url.searchParams.set("client_id", process.env.GITHUB_CLIENT_ID ?? "");
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("state", state);
-  // `public_repo` is the narrowest scope that can push a commit to a public
-  // repository. `read:user` is only there to resolve the login for the
-  // allowlist check — no email scope is requested.
-  url.searchParams.set("scope", "public_repo read:user");
+  // `public_repo` is the narrowest scope that can push to a *public*
+  // repository, and is the default. A private repository is invisible to it —
+  // GitHub answers 404 rather than 403 — so set GITHUB_OAUTH_SCOPE=repo when
+  // publishing to one. `read:user` only resolves the login for the allowlist
+  // check; no email scope is ever requested.
+  url.searchParams.set("scope", `${oauthScope()} read:user`);
   url.searchParams.set("allow_signup", "false");
   return url.toString();
 }
@@ -174,6 +182,31 @@ export async function commitFiles(opts: {
   });
 
   return { sha: commit.sha, url: commit.html_url };
+}
+
+/**
+ * Turn a GitHub failure into something a maintainer can act on.
+ *
+ * The 404 case is the one worth spelling out: GitHub returns "Not Found" for a
+ * private repository the token cannot see, which is indistinguishable from a
+ * typo in GITHUB_REPO unless somebody explains it.
+ */
+export function explainGitHubError(err: unknown, target: RepoTarget): string {
+  if (!(err instanceof GitHubError)) return "Could not reach GitHub.";
+
+  if (err.status === 404) {
+    return (
+      `GitHub cannot see ${target.owner}/${target.repo} on branch ${target.branch}. ` +
+      (oauthScope() === "public_repo"
+        ? "If the repository is private, the default public_repo scope cannot access it — set GITHUB_OAUTH_SCOPE=repo and sign in again, or make the repository public. "
+        : "") +
+      "Otherwise check GITHUB_REPO and GITHUB_BRANCH."
+    );
+  }
+  if (err.status === 403) {
+    return `Your GitHub account is not allowed to push to ${target.owner}/${target.repo}.`;
+  }
+  return err.message;
 }
 
 export async function headSha(token: string, target: RepoTarget): Promise<string> {

@@ -147,3 +147,64 @@
 @media (max-width: 740px) {
   .admin-editor-page { height: auto; overflow: visible }
 }
+
+/* ── Bulk selection ─────────────────────────────────────────
+   A working set imported from the old studio arrives as hundreds of drafts, so
+   acting on them one at a time is not a real workflow. Selection lives on the
+   card itself; the actions live in a bar that only exists while something is
+   selected.
+   ───────────────────────────────────────────────────────── */
+
+/* A button rather than a checkbox input: it has to report shift-click, and a
+   controlled input whose default is prevented drifts out of sync with the DOM. */
+.card-select {
+  position: absolute; top: 9px; left: 9px; z-index: 1;
+  display: grid; place-items: center; width: 17px; height: 17px;
+  border: 1px solid var(--line-strong); border-radius: 4px;
+  background: var(--surface); color: var(--on-ink);
+  opacity: 0; transition: opacity .18s var(--ease), background .14s var(--ease), border-color .14s var(--ease);
+}
+.card:hover .card-select,
+.card:focus-within .card-select,
+.card-select:focus-visible,
+.card.is-selected .card-select,
+.icon-grid.is-selecting .card-select { opacity: 1 }
+.card-select:hover { border-color: var(--ink) }
+.card-select.is-on { background: var(--ink); border-color: var(--ink) }
+
+.card.is-selected { border-color: var(--ink); box-shadow: var(--shadow-2) }
+
+.select-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
+.select-bar .link-btn {
+  font-size: 12px; color: var(--muted); text-decoration: underline;
+  text-underline-offset: 2px; transition: color .16s var(--ease);
+}
+.select-bar .link-btn:hover { color: var(--ink) }
+
+/* Docked rather than inline: the selection is made by scrolling through a long
+   grid, so the actions have to stay reachable without scrolling back. */
+.bulk-bar {
+  position: fixed; left: 50%; bottom: calc(24px + var(--safe-bottom)); z-index: 70;
+  transform: translate(-50%, 0);
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 12px 10px 18px; border-radius: 10px;
+  border: 1px solid var(--line-strong); background: var(--surface);
+  box-shadow: var(--shadow-3);
+  max-width: min(760px, calc(100vw - 32px));
+}
+.bulk-count {
+  font-family: var(--mono); font-size: 12px; color: var(--ink);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.bulk-sep { width: 1px; align-self: stretch; background: var(--line); margin: 2px 0 }
+.bulk-bar .btn { height: 30px }
+.bulk-hint { font-size: 11.5px; color: var(--faint); white-space: nowrap }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-select { transition: none }
+}
+
+@media (max-width: 660px) {
+  .bulk-bar { left: 16px; right: 16px; transform: none; max-width: none; justify-content: center }
+  .bulk-hint { display: none }
+}

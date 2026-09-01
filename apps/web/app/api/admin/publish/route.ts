@@ -1,5 +1,5 @@
 import { bad, guard, ok } from "@/lib/guard";
-import { GitHubError, commitFiles, headSha, repoTarget } from "@/lib/github";
+import { GitHubError, commitFiles, explainGitHubError, headSha, repoTarget } from "@/lib/github";
 import { buildChanges, commitMessage } from "@/lib/publish";
 import { clearPublished, planPublish } from "@/lib/working";
 
@@ -16,6 +16,8 @@ import { clearPublished, planPublish } from "@/lib/working";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+const MAX_IDS = 2000;
+
 export async function GET(req: Request) {
   const g = await guard(req);
   if (!g.ok) return g.response;
@@ -29,7 +31,7 @@ export async function GET(req: Request) {
     try {
       head = await headSha(g.session.githubToken, target);
     } catch (err) {
-      repoError = err instanceof Error ? err.message : "Could not reach GitHub.";
+      repoError = explainGitHubError(err, target);
     }
   }
 
@@ -39,6 +41,12 @@ export async function GET(req: Request) {
     branch: target?.branch ?? null,
     head,
     repoError,
+    scoped: plan.scoped,
+    excludedRemovals: plan.excludedRemovals,
+    // How many glyphs the published set will hold afterwards. A scoped publish
+    // must still write the whole manifest, so this is the guard against one
+    // silently truncating the set to just the selection.
+    nextCount: plan.next.length,
     added: plan.added,
     modified: plan.modified,
     removed: plan.removed,
@@ -58,16 +66,30 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { expectedHead?: string | null };
+  let body: { expectedHead?: string | null; ids?: unknown };
   try {
     body = (await req.json()) as typeof body;
   } catch {
     body = {};
   }
 
-  const plan = await planPublish();
+  // The plan is recomputed here from the same ids rather than trusted from the
+  // client: the dialog shows a preview, but what gets committed is derived
+  // server-side from the working set as it stands right now.
+  let ids: string[] | undefined;
+  if (Array.isArray(body.ids)) {
+    if (body.ids.length > MAX_IDS) return bad(`Too many glyphs at once — the limit is ${MAX_IDS}.`);
+    ids = body.ids.filter((id): id is string => typeof id === "string");
+    if (!ids.length) return bad("No glyphs selected.");
+  }
+
+  const plan = await planPublish(ids ? { ids } : {});
   if (!plan.added.length && !plan.modified.length && !plan.removed.length) {
-    return bad("Nothing to publish — the repo already matches the working set.");
+    return bad(
+      ids
+        ? "Nothing to publish in that selection — those glyphs are either unchanged or not marked final."
+        : "Nothing to publish — the repo already matches the working set."
+    );
   }
 
   const publishedAt = new Date().toISOString();
@@ -94,17 +116,16 @@ export async function POST(req: Request) {
       ok: true,
       commit: commit.sha.slice(0, 7),
       url: commit.url,
+      scoped: plan.scoped,
       added: plan.added.length,
       modified: plan.modified.length,
       removed: plan.removed.length,
     });
   } catch (err) {
     if (err instanceof GitHubError) {
-      const hint =
-        err.status === 403 || err.status === 404
-          ? " Check that your GitHub account can push to this repository."
-          : "";
-      return bad(err.message + hint, err.status === 409 ? 409 : 502);
+      // 409 is the compare-and-swap losing to a concurrent push, which is a
+      // conflict the caller can retry — everything else is a bad gateway.
+      return bad(explainGitHubError(err, target), err.status === 409 ? 409 : 502);
     }
     console.error("publish failed", err);
     return bad("The publish failed. Nothing was committed.", 500);
