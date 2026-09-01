@@ -1,137 +1,151 @@
 # Termina Icons
 
-The public site for the Termina 13×13 pixel icon set, plus the studio it is
-drawn in. Both are the same file.
+A free, open-source pixel icon set drawn on a 13×13 grid — plus the studio it
+is drawn in, the review queue it grows through, and the npm package it ships as.
 
-`#/` is the landing page: hero, a short account of how the set is built,
-resources, and then the drawer. `#/editor` is the studio.
+Every glyph occupies the same 169 cells. Nothing sits half a pixel off, so
+weight and rhythm stay even across the set, and every export is `<rect>`
+elements with `shape-rendering="crispEdges"` that inherit `currentColor`.
 
 ```
-public/index.html          the whole app — landing, drawer, editor, export
-public/icon.svg            the T mark (drawn in the studio itself)
-scripts/make-icons.mjs     regenerates the icon PNGs from that SVG
-netlify/functions/sync     private working set (passphrase-gated)
-netlify/functions/publish  cuts a public snapshot of the final glyphs
-netlify/functions/public-set   GET /api/set        public, CORS-open
-netlify/functions/sprite       GET /api/sprite.svg public, CORS-open
-netlify/lib/glyph.mjs      shared server helpers
+termina/
+├── icons/                  the set itself — the source of truth
+│   ├── icons.json          every glyph's metadata and 169-character bitmap
+│   └── svg/<slug>.svg      one generated file per glyph, so PRs are reviewable
+├── apps/web/               the Next.js site: drawer, editor, admin console
+├── packages/
+│   ├── glyph/              the glyph format and everything derived from it
+│   └── icons/              the publishable npm package, built from icons/
+├── scripts/                icon-set integrity checks and the legacy importer
+└── docs/                   deployment, architecture, publishing, anti-abuse
 ```
 
-## Deploying
+## What it does
 
-You need a Netlify account and the CLI. The CLI's `login` and `init` steps open a
-browser and sign you in — run those yourself; everything after is scriptable.
+**For anyone, with no account:**
+
+- Browse, search and filter the whole set
+- Copy or download any glyph as SVG — one at a time, a whole category, or the
+  entire set as a zip with the manifest and the licence
+- Draw new glyphs in the editor, or open a published one and change it
+- Submit either for review — no sign-in, ever
+
+**For maintainers:**
+
+- Draw glyphs as drafts that stay private, or mark them final
+- Review the submission queue: see a proposed edit side by side with the live
+  glyph, correct its metadata, accept or reject it
+- Publish, which commits the set to this repository as you and rebuilds the site
+
+## Running it
 
 ```bash
 npm install
-npx netlify-cli login
-npx netlify-cli init
+npm run dev
 ```
 
-Set the shared passphrase before the first real deploy. Choose something long;
-it is the only thing standing between the public URL and your set.
+That is the whole setup. The site comes up at <http://localhost:3000> with the
+committed icon set, a working editor, and a submission flow backed by JSON files
+under `.data/` — no accounts, no keys, no services.
+
+Only the admin console needs configuration. See [docs/deployment.md](docs/deployment.md).
 
 ```bash
-npx netlify-cli env:set TERMINA_KEY "your-long-shared-passphrase"
+npm run dev            # the site
+npm test               # the glyph format's test suite
+npm run typecheck      # TypeScript across the workspace
+npm run lint
+npm run build          # package, then site
+npm run icons:check    # the manifest and the SVG files must agree
+npm run icons:write    # regenerate icons/svg/ from the manifest
+npm run icons:raster   # regenerate the app-icon PNGs from apps/web/public/icon.svg
 ```
 
-Then ship it:
+## How the set is stored
 
-```bash
-npx netlify-cli deploy --prod
-```
-
-Local development, with Blobs and functions emulated:
-
-```bash
-npx netlify-cli dev
-```
-
-The site is served with `X-Robots-Tag: noindex, nofollow` from `netlify.toml`.
-Drop that header when the set is ready to be found.
-
-> If `TERMINA_KEY` is unset the API is **open** — anyone with the URL can read
-> and write the set. That is fine for `netlify dev`, never for production.
-
-## How syncing works
-
-Each device keeps a full copy in `localStorage` and works offline. On boot, on
-reconnect, on tab focus, every 90 seconds, and 800ms after any edit, the device
-posts everything it holds to `/api/sync`. The server merges per glyph — newest
-`updatedAt` wins — and returns the authoritative document, which replaces local
-state. Push and pull are the same round trip, so a device coming back online
-needs exactly one request to catch up.
-
-Deletes are recorded as tombstones rather than plain removals, so a glyph
-deleted on the laptop does not get resurrected by the desktop's stale copy.
-A tombstone loses to a genuinely newer edit, so editing a glyph after deleting
-it elsewhere revives it deliberately. Tombstones are pruned after 120 days.
-
-The status pill in the header shows the current state — `Synced`, `Unpushed`,
-`Offline`, `Locked`. Click it to force a sync or re-enter the passphrase.
-
-## The public feed
-
-`Export → Publish final glyphs` writes a snapshot containing **only glyphs
-marked `final`**. Draft and review glyphs never leave the private set. The
-snapshot is served without a passphrase, from any origin:
-
-- `GET /api/set` — JSON: `{ format, version, grid, publishedAt, count, icons[] }`
-- `GET /api/sprite.svg` — an SVG sprite of `<symbol>` elements
-
-That is the seam for the eventual public icon-set site on its own domain. It can
-fetch the JSON and render however it likes:
-
-```js
-const { icons } = await fetch("https://<site>/api/set").then(r => r.json());
-```
-
-Or skip the build step entirely and reference the sprite:
-
-```html
-<svg width="26" height="26" fill="#111">
-  <use href="https://<site>/api/sprite.svg#termina-terminal-window"/>
-</svg>
-```
-
-Publishing is explicit. Nothing becomes public until you mark a glyph final
-*and* click publish.
-
-## The app icon and favicon
-
-`public/icon.svg` is the T mark, exported straight from the studio. It carries
-a `prefers-color-scheme` rule, so the tab icon is ink on a light browser and
-paper on a dark one. iOS and the web manifest need rasters, so redraw it there,
-replace that file, and run:
-
-```bash
-node scripts/make-icons.mjs
-```
-
-That regenerates `icon-32/180/192/512` and the maskable variant, scaling the
-13×13 grid by whole integers so no pixel lands on a half boundary. The tiles are
-white-on-ink; flip `INK`/`PAPER` at the top of the script to invert them.
-
-On the tablet, Share → Add to Home Screen installs the studio as a standalone
-app with this icon.
-
-## Glyph format
+`icons/icons.json` is the source of truth. Each glyph carries a name, a stable
+slug, a category, keywords, a version, and `pixels` — 169 characters of `0`/`1`,
+row-major from the top-left.
 
 ```json
 {
-  "id": "gx1a2b3c",
   "name": "Terminal window",
   "slug": "terminal-window",
   "category": "System",
   "tags": ["shell", "console"],
-  "status": "final",
   "version": 2,
-  "pixels": "0000…",
-  "createdAt": "2026-08-16T…",
-  "updatedAt": "2026-08-16T…"
+  "pixels": "0000…"
 }
 ```
 
-`pixels` is 169 characters of `0`/`1`, row-major from the top-left. Exported
-SVGs merge horizontal runs into single `<rect>` elements and use
-`shape-rendering="crispEdges"` with `fill="currentColor"`.
+`icons/svg/*.svg` is generated from that and committed alongside it, so a pull
+request against the icon set shows the actual drawing changing. `npm run
+icons:check` runs in CI and fails if the two ever disagree, if a slug is
+malformed or duplicated, or if the manifest has been hand-edited out of its
+canonical form.
+
+To regenerate the SVG files after editing the manifest:
+
+```bash
+npm run icons:write
+```
+
+## Using the icons
+
+```bash
+npm install termina-icons
+```
+
+```jsx
+import { TerminalWindow } from "termina-icons/react";
+
+<TerminalWindow size={26} />
+```
+
+There is a metadata-only entry point that does not import React, plus raw SVG
+files and a sprite. See [packages/icons/README.md](packages/icons/README.md).
+
+You can also read the set straight off the site, with no install:
+
+```js
+const { icons } = await fetch("https://<site>/api/set").then((r) => r.json());
+```
+
+```html
+<svg width="26" height="26" fill="currentColor">
+  <use href="https://<site>/api/sprite.svg#termina-terminal-window" />
+</svg>
+```
+
+## Contributing
+
+The easiest way to add an icon is to draw it in the editor on the site and
+submit it — that needs no account and no git. Code changes and bulk icon
+contributions go through pull requests as usual.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Migrating from the old single-file studio
+
+Earlier versions of this project were one `public/index.html` with Netlify
+Functions behind a shared passphrase. To bring an existing set across, export it
+from the old app (**Export → Set as JSON**) and run:
+
+```bash
+npm run icons:import -- ~/Downloads/termina-iconset.json
+```
+
+Glyphs marked `final` go into `icons/`; drafts land in the local working set.
+Pass `--all` to publish everything regardless of status.
+
+## Documentation
+
+- [docs/deployment.md](docs/deployment.md) — deploying, and the environment it needs
+- [docs/architecture.md](docs/architecture.md) — how the pieces fit, and why
+- [docs/npm-package.md](docs/npm-package.md) — what an npm package is and how to publish this one
+- [docs/anti-abuse.md](docs/anti-abuse.md) — what protects the submission endpoint
+- [SECURITY.md](SECURITY.md) — reporting a vulnerability
+
+## License
+
+MIT — both the code and the icons. See [LICENSE](LICENSE).

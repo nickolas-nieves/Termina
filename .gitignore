@@ -1,5 +1,21 @@
 node_modules/
+.next/
 .netlify/
+out/
+dist/
+
+# Local key/value store used when Netlify Blobs is unavailable (plain `next dev`).
+# It holds sessions, the working set and the submission queue — never commit it.
+.data/
+
 .env
 .env.*
+!.env.example
+*.tgz
+
 .DS_Store
+*.log
+.vercel
+
+SECURITY.md
+docs/

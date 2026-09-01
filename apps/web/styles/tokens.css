@@ -1,0 +1,86 @@
+/* ─────────────────────────────────────────────────────────────
+   Termina — design tokens
+   Every themed value is declared once with light-dark(). `color-scheme` on the
+   root decides which half is used, so the switcher only has to set one
+   attribute — and leaving it unset keeps the whole palette on the OS setting.
+   ───────────────────────────────────────────────────────────── */
+
+/* Work Sans carries every weight this app uses off one variable file. */
+@font-face {
+  font-family: 'Work Sans';
+  src: url('/fonts/WorkSans-Variable.woff2') format('woff2');
+  font-weight: 100 200 300 400 500 600 700 800 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light dark;
+
+  --canvas:        light-dark(#FBFBFA, #191918);
+  --canvas-blur:   light-dark(rgba(251,251,250,.88), rgba(25,25,24,.86));
+  --surface:       light-dark(#FFFFFF, #202020);
+  --surface-2:     light-dark(#F7F6F3, #2A2A28);
+  --surface-glass: light-dark(rgba(255,255,255,.9), rgba(32,32,32,.92));
+  --ink:           light-dark(#111111, #EDECE9);
+  --ink-hover:     light-dark(#333333, #FFFFFF);
+  --ink-soft:      light-dark(#2F3437, #D5D3CE);
+  --muted:         light-dark(#787774, #9B9A97);
+  --faint:         light-dark(#9B9A97, #8A8983);
+  --line:          light-dark(#EAEAEA, #333330);
+  --line-strong:   light-dark(#DEDEDE, #46453F);
+  --line-focus:    light-dark(#C9C9C7, #5A594F);
+  --line-soft:     light-dark(rgba(0,0,0,.06), rgba(255,255,255,.07));
+  --placeholder:   light-dark(#C2C1BE, #5F5E57);
+
+  /* Foreground for anything sitting on a solid --ink fill. */
+  --on-ink:        light-dark(#FFFFFF, #191918);
+  --on-ink-soft:   light-dark(rgba(255,255,255,.6), rgba(25,25,24,.6));
+
+  --wash:          light-dark(rgba(120,119,116,.05), rgba(255,255,255,.035));
+  --scrim:         light-dark(rgba(17,17,17,.24), rgba(0,0,0,.52));
+  --px-hover:      light-dark(rgba(17,17,17,.22), rgba(237,236,233,.3));
+  --px-hover-on:   light-dark(rgba(255,255,255,.35), rgba(25,25,24,.32));
+  --shadow-1:      light-dark(0 1px 3px rgba(0,0,0,.03), 0 1px 3px rgba(0,0,0,.3));
+  --shadow-2:      light-dark(0 2px 8px rgba(0,0,0,.04), 0 2px 10px rgba(0,0,0,.36));
+  --shadow-3:      light-dark(0 8px 40px rgba(0,0,0,.08), 0 10px 44px rgba(0,0,0,.55));
+
+  --pale-red:    light-dark(#FDEBEC, #39221F);  --pale-red-ink:    light-dark(#9F2F2D, #F0918B);
+  --pale-blue:   light-dark(#E1F3FE, #16303F);  --pale-blue-ink:   light-dark(#1F6C9F, #86C7EE);
+  --pale-green:  light-dark(#EDF3EC, #1E2C1F);  --pale-green-ink:  light-dark(#346538, #8FCB95);
+  --pale-yellow: light-dark(#FBF3DB, #362C1B);  --pale-yellow-ink: light-dark(#956400, #E2BB62);
+  --edge-red:    light-dark(#F4D6D8, #5A2E2B);
+
+  --ok:   light-dark(#4E9A5A, #6FBE7C);
+  --info: light-dark(#1F6C9F, #6BB4E4);
+  --warn: light-dark(#956400, #D9A93E);
+  --bad:  light-dark(#9F2F2D, #E4736C);
+
+  /* Two families, and only two: Work Sans carries the prose, the eyebrows and
+     the headings; the mono is reserved for slugs, metadata and code. */
+  --sans: 'Work Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --display: 'Work Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --mono: 'SF Mono','JetBrains Mono','Geist Mono',ui-monospace,Menlo,monospace;
+
+  --cell: 34px;
+  /* Installed to a home screen the page runs under the status bar, so the
+     header height has to absorb the top inset. Zero in a normal browser tab. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --masthead: calc(61px + var(--safe-top));
+  --ease: cubic-bezier(.16,1,.3,1);
+}
+
+/* The switcher's only job: pin the scheme, or clear the attribute for "System". */
+:root[data-theme="light"] { color-scheme: light }
+:root[data-theme="dark"]  { color-scheme: dark }
+
+/* The board is the one element that can flex, so derive the pixel size from
+   whatever height is left after the masthead, toolbar, previews and padding.
+   Falls back to vh where dvh is unsupported. */
+@media (min-width: 741px) {
+  :root {
+    --cell: clamp(16px, min(calc((100vh - 320px) / 13), calc((100vw - 420px) / 13)), 34px);
+    --cell: clamp(16px, min(calc((100dvh - 320px) / 13), calc((100vw - 420px) / 13)), 34px);
+  }
+}

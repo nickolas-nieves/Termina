@@ -1,26 +1,41 @@
+# Netlify build for the Termina monorepo.
+#
+# The build runs from the repository root so npm workspaces resolve, and
+# publishes the Next.js app in apps/web. The Next Runtime plugin handles the
+# server routes; everything under `icons/` is baked into the build, so the
+# public pages are static.
+
 [build]
-  publish = "public"
-  # No build step — the app is a single static file.
-  # `npm install` still runs so functions get @netlify/blobs.
+  command = "npm run icons:check && npm run build"
+  publish = "apps/web/.next"
 
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
+[build.environment]
+  NODE_VERSION = "20"
+  # Netlify's default is fine, but pin it so a contributor's local npm and CI
+  # resolve the workspace graph the same way.
+  NPM_FLAGS = "--no-audit --no-fund"
 
-# The studio itself is passphrase-gated at the API layer, but keep it out
-# of search results and out of frames regardless.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Security headers. next.config.mjs sets these for app routes; repeating them
+# here covers static assets and anything served outside the Next runtime.
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "no-referrer"
-    X-Robots-Tag = "noindex, nofollow"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+
+# The public site is meant to be found. The admin console opts itself out via
+# its own route metadata, and robots.txt disallows it.
 
 [[headers]]
-  for = "/manifest.webmanifest"
+  for = "/fonts/*"
   [headers.values]
-    Content-Type = "application/manifest+json; charset=utf-8"
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "/icon-*.png"
@@ -31,10 +46,3 @@
   for = "/icon.svg"
   [headers.values]
     Cache-Control = "public, max-age=604800"
-
-# The font file is inert — rename it if it is ever regenerated, since nothing
-# here busts the cache.
-[[headers]]
-  for = "/fonts/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"

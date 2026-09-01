@@ -1,0 +1,21 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Termina Icons",
+    short_name: "Termina",
+    description: "A pixel icon set drawn on a 13 by 13 grid.",
+    start_url: "/",
+    scope: "/",
+    display: "standalone",
+    background_color: "#FBFBFA",
+    theme_color: "#FBFBFA",
+    orientation: "any",
+    icons: [
+      { src: "/icon.svg", type: "image/svg+xml", sizes: "any", purpose: "any" },
+      { src: "/icon-192.png", type: "image/png", sizes: "192x192", purpose: "any" },
+      { src: "/icon-512.png", type: "image/png", sizes: "512x512", purpose: "any" },
+      { src: "/icon-512-maskable.png", type: "image/png", sizes: "512x512", purpose: "maskable" },
+    ],
+  };
+}

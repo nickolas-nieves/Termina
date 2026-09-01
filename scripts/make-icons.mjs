@@ -1,5 +1,5 @@
 /**
- * Renders the app icon PNGs from public/icon.svg.
+ * Renders the app icon PNGs from apps/web/public/icon.svg.
  *
  * iOS home-screen icons and the web manifest need real rasters, and every
  * pixel must land on an exact boundary, so this scales the 13×13 mark by whole
@@ -13,8 +13,8 @@ import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SRC = path.join(ROOT, "public", "icon.svg");
-const OUT = path.join(ROOT, "public");
+const SRC = path.join(ROOT, "apps", "web", "public", "icon.svg");
+const OUT = path.join(ROOT, "apps", "web", "public");
 
 const N = 13;
 const INK = [0x11, 0x11, 0x11];
@@ -120,4 +120,4 @@ for (const [name, size, colors, inset] of targets) {
   fs.writeFileSync(path.join(OUT, name), buf);
   console.log(`${name.padEnd(24)} ${size}×${size}  ${String(buf.length).padStart(6)} bytes`);
 }
-console.log("\nDone. Icons written to public/");
+console.log("\nDone. Icons written to apps/web/public/");

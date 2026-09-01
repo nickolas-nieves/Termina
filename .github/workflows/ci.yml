@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # First, because it is the fastest signal and the one that protects the
+      # icon set itself: the manifest and the SVG files must agree, and every
+      # slug must be unique and well-formed.
+      - name: Check the icon set
+        run: npm run icons:check
+
+      - name: Tests
+        run: npm test
+
+      - name: Types
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # A publish commits generated files. If the package build does not
+      # reproduce them exactly, the npm release would drift from the repo.
+      - name: Generated files are reproducible
+        run: |
+          npm run icons:write
+          git diff --exit-code -- icons \
+            || (echo "::error::icons/ is not in its generated form — run 'npm run icons:write' and commit the result" && exit 1)

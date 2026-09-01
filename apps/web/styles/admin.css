@@ -1,0 +1,149 @@
+/* ── Admin console ──────────────────────────────────────────
+   Deliberately built from the same primitives as the public site — the same
+   cards, chips, pills and fields — so there is one design system to maintain
+   rather than two that drift.
+   ───────────────────────────────────────────────────────── */
+
+.admin-shell { max-width: 1360px; margin: 0 auto; padding: 0 32px 96px }
+
+.admin-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap; padding: 44px 0 18px;
+}
+.admin-head h1 {
+  margin: 0; font-family: var(--display); font-weight: 700;
+  font-size: 26px; letter-spacing: -.035em; line-height: 1.15;
+}
+.admin-head p { margin: 7px 0 0; color: var(--muted); max-width: 62ch }
+.admin-head .admin-actions { display: flex; gap: 8px; flex-wrap: wrap }
+
+.admin-tabs {
+  display: flex; align-items: center; gap: 4px;
+  border-bottom: 1px solid var(--line); margin-bottom: 24px;
+}
+.admin-tabs a {
+  position: relative; padding: 10px 13px 12px; font-size: 13px;
+  color: var(--muted); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: color .16s var(--ease);
+}
+.admin-tabs a:hover { color: var(--ink-soft) }
+.admin-tabs a[aria-current="page"] { color: var(--ink) }
+.admin-tabs a[aria-current="page"]::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; background: var(--ink);
+}
+.admin-tabs .badge { margin-left: 0 }
+
+/* ── Review queue ───────────────────────────────────────── */
+.queue { display: grid; gap: 12px }
+.sub-card {
+  display: grid; grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center; gap: 22px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+  padding: 18px 20px;
+  transition: border-color .18s var(--ease), box-shadow .18s var(--ease);
+}
+.sub-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow-1) }
+.sub-card.is-busy { opacity: .5; pointer-events: none }
+
+/* Side-by-side when a submission edits a glyph already in the set: the shipped
+   version, an arrow, the proposal. Reviewing a change means seeing both. */
+.sub-visual { display: flex; align-items: center; gap: 14px; flex: none }
+.sub-tile {
+  display: grid; place-items: center; width: 62px; height: 62px; flex: none;
+  border: 1px solid var(--line); border-radius: 6px;
+  background: var(--canvas); color: var(--ink);
+}
+.sub-tile.was { opacity: .55 }
+.sub-arrow { color: var(--faint); flex: none }
+
+.sub-body { min-width: 0 }
+.sub-title { display: flex; align-items: center; gap: 9px; flex-wrap: wrap }
+.sub-title .name { font-size: 14px; color: var(--ink) }
+.sub-title code { font-family: var(--mono); font-size: 11px; color: var(--faint) }
+.sub-meta {
+  margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-family: var(--mono); font-size: 10.5px; color: var(--faint);
+}
+.sub-meta .dot-sep { opacity: .5 }
+.sub-tags { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 5px }
+.sub-actions { display: flex; align-items: center; gap: 6px; flex: none; flex-wrap: wrap; justify-content: flex-end }
+
+/* ── Publish diff ───────────────────────────────────────── */
+.diff-list {
+  margin: 0 0 4px; padding: 0; list-style: none;
+  display: grid; gap: 6px; max-height: 260px; overflow-y: auto;
+}
+.diff-list li {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft);
+}
+.diff-mark { flex: none; width: 15px; text-align: center; font-weight: 700 }
+.diff-add .diff-mark { color: var(--ok) }
+.diff-mod .diff-mark { color: var(--warn) }
+.diff-del .diff-mark { color: var(--bad) }
+.diff-list .diff-tile { flex: none; color: var(--ink); display: grid; place-items: center; width: 22px }
+
+.stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px }
+.stat {
+  border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+  padding: 14px 18px; min-width: 122px;
+}
+.stat dt {
+  font-family: var(--sans); font-weight: 400; font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint);
+}
+.stat dd {
+  margin: 4px 0 0; font-family: var(--display); font-weight: 700;
+  font-size: 24px; letter-spacing: -.03em; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Sign-in ────────────────────────────────────────────── */
+.signin { display: grid; place-items: center; min-height: calc(100dvh - var(--masthead)); padding: 32px }
+.signin-card {
+  width: min(400px, 100%); text-align: center;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+  padding: 40px 32px 32px; box-shadow: var(--shadow-2);
+}
+.signin-card .mark { display: grid; place-items: center; color: var(--ink); margin-bottom: 20px }
+.signin-card .mark svg { height: 34px; width: auto; fill: currentColor; shape-rendering: crispEdges }
+.signin-card h1 {
+  margin: 0 0 8px; font-family: var(--display); font-weight: 700;
+  font-size: 21px; letter-spacing: -.03em;
+}
+.signin-card p { margin: 0 0 24px; color: var(--muted); font-size: 13px; line-height: 1.55 }
+
+.notice {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: 8px; margin-bottom: 22px;
+  font-size: 12.5px; line-height: 1.5;
+}
+.notice svg { flex: none; margin-top: 2px }
+.notice-warn { background: var(--pale-yellow); color: var(--pale-yellow-ink) }
+.notice-bad  { background: var(--pale-red);    color: var(--pale-red-ink) }
+.notice-info { background: var(--surface-2);   color: var(--muted) }
+
+/* ── Admin editor ───────────────────────────────────────────
+   The studio is sized to one viewport minus the masthead. Inside the console
+   there is also a tab row above it, so the page becomes a flex column and the
+   studio takes whatever is left — exact whatever the tabs measure, rather than
+   a magic number that drifts when the tabs change.
+   ───────────────────────────────────────────────────────── */
+.admin-editor-page {
+  display: flex; flex-direction: column;
+  height: calc(100vh - var(--masthead));
+  height: calc(100dvh - var(--masthead));
+  overflow: hidden;
+}
+.admin-editor-page .studio { flex: 1; height: auto; min-height: 0 }
+/* `margin: 0 auto` on a flex item centres it at its intrinsic width rather
+   than stretching, so the tab row needs its width back explicitly. */
+.admin-editor-page > .admin-shell { width: 100% }
+
+/* Phones stack and scroll anyway, so the fixed height would only trap the
+   sidebar below the fold with no way to reach it. */
+@media (max-width: 740px) {
+  .admin-editor-page { height: auto; overflow: visible }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@termina/glyph",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared glyph primitives: the 13×13 bitmap format, its SVG rendering, and validation. Plain ESM so Node scripts can import it with no build step.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "files": ["index.js", "index.d.ts"]
+}

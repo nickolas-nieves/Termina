@@ -1,0 +1,215 @@
+/* ── Layout ─────────────────────────────────────────────── */
+.studio {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 336px;
+  /* Exactly one viewport tall — the editor never scrolls the page. */
+  height: calc(100vh - var(--masthead));
+  height: calc(100dvh - var(--masthead));
+  overflow: hidden;
+}
+.stage {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  /* `safe` keeps the toolbar reachable if the column ever does overflow —
+     plain centring would clip the top edge out of the scroll range. */
+  justify-content: safe center;
+  padding: 28px 24px 32px; gap: 18px;
+  min-height: 0; overflow: auto;
+  background:
+    radial-gradient(680px 420px at 50% -6%, var(--wash), transparent 70%),
+    var(--canvas);
+}
+
+/* ── Toolbar ────────────────────────────────────────────── */
+.toolbar {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface);
+}
+.tool {
+  display: grid; place-items: center;
+  width: 31px; height: 31px; border-radius: 5px; color: var(--muted);
+  transition: background .16s var(--ease), color .16s var(--ease);
+}
+.tool:hover { background: var(--surface-2); color: var(--ink) }
+.tool:active { transform: scale(.94) }
+.tool:disabled { opacity: .3; pointer-events: none }
+.tool.is-on { background: var(--ink); color: var(--on-ink) }
+.tool-sep { width: 1px; height: 20px; background: var(--line); margin: 0 4px }
+
+/* ── Grid board ─────────────────────────────────────────── */
+.board-wrap { position: relative }
+.board {
+  display: grid;
+  grid-template-columns: repeat(13, var(--cell));
+  grid-template-rows: repeat(13, var(--cell));
+  gap: 0; padding: 0;
+  /* reference grid lives behind the pixels, never between them */
+  background-color: var(--surface);
+  background-image:
+    repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px var(--cell)),
+    repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px var(--cell));
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  touch-action: none;
+  user-select: none;
+  cursor: crosshair;
+  box-shadow: var(--shadow-1);
+}
+.board.no-grid { background-image: none }
+.px { background: transparent; transition: background .07s linear; padding: 0; border: 0 }
+.px.on { background: var(--ink) }
+.px:hover { box-shadow: inset 0 0 0 1.5px var(--px-hover) }
+.px.on:hover { box-shadow: inset 0 0 0 1.5px var(--px-hover-on) }
+.px.axis:not(.on) { background: var(--wash) }
+.board.no-guides .px.axis:not(.on) { background: transparent }
+
+.safe-area {
+  position: absolute; pointer-events: none;
+  inset: calc(1px + var(--cell));
+  border: 1px dashed rgba(120,119,116,.34);
+  border-radius: 2px;
+  opacity: 1; transition: opacity .2s var(--ease);
+}
+.safe-area.is-off { opacity: 0 }
+
+.ruler {
+  position: absolute; font-family: var(--mono); font-size: 9.5px;
+  color: var(--faint); letter-spacing: .04em; pointer-events: none;
+}
+.ruler.top { top: -19px; left: 1px; display: grid; grid-template-columns: repeat(13, var(--cell)); gap: 0; text-align: center }
+.ruler.left { left: -19px; top: 1px; display: grid; grid-template-rows: repeat(13, var(--cell)); gap: 0; align-items: center; text-align: right; width: 14px }
+
+/* ── Preview strip ──────────────────────────────────────── */
+.previews {
+  display: flex; align-items: flex-end; gap: 26px;
+  padding: 16px 22px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface);
+}
+.pv { display: flex; flex-direction: column; align-items: center; gap: 9px }
+.pv .chip {
+  font-family: var(--sans); font-weight: 400; font-size: 9.5px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--faint);
+}
+.pv .frame { display: grid; place-items: center; min-height: 52px; color: var(--ink) }
+.pv svg { display: block; image-rendering: pixelated }
+/* Inverse preview flips with the theme too: the glyph takes the colour that
+   contrasts whatever --ink currently is. */
+.pv.inverse .frame {
+  background: var(--ink); color: var(--on-ink);
+  border-radius: 5px; padding: 10px; min-height: 0;
+}
+.pv-divider { width: 1px; align-self: stretch; background: var(--line); margin: 2px 0 }
+
+/* ── Sidebar ────────────────────────────────────────────── */
+.sidebar {
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  display: flex; flex-direction: column;
+  height: 100%; min-height: 0;
+}
+.side-head { padding: 20px 22px 16px; border-bottom: 1px solid var(--line) }
+.side-head .eyebrow {
+  font-family: var(--sans); font-weight: 400; font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint);
+}
+.side-head h2 {
+  margin: 6px 0 0; font-family: var(--display); font-weight: 700;
+  font-size: 21px; line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.side-body { flex: 1; overflow-y: auto; padding: 20px 22px 24px }
+.side-foot {
+  padding: 14px 22px calc(16px + var(--safe-bottom)); border-top: 1px solid var(--line);
+  background: var(--surface); display: flex; flex-direction: column; gap: 8px;
+}
+
+.field { margin-bottom: 17px }
+.field:last-child { margin-bottom: 0 }
+.label {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--sans); font-weight: 400; font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--faint); margin-bottom: 6px;
+}
+.label .hint { text-transform: none; letter-spacing: .01em; font-size: 10.5px; font-weight: 400 }
+.input {
+  width: 100%; height: 34px; padding: 0 10px;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--surface);
+  outline: none; transition: border-color .18s var(--ease), background .18s var(--ease);
+}
+.input:hover { border-color: var(--line-strong) }
+.input:focus { border-color: var(--line-focus); background: var(--surface) }
+.input::placeholder { color: var(--placeholder) }
+.input.mono { font-family: var(--mono); font-size: 12.5px }
+.input.is-bad { border-color: var(--edge-red) }
+textarea.input { height: auto; padding: 8px 10px; resize: vertical; min-height: 58px; line-height: 1.5 }
+
+.field-error { margin: 6px 0 0; font-size: 11.5px; color: var(--bad) }
+
+/* Category is a combobox: free text (categories are user-defined) plus a
+   dropdown of everything already in use, so you don't retype or fork a
+   near-duplicate name by hand. */
+.combo { position: relative }
+.combo .input { padding-right: 32px }
+.combo-toggle {
+  position: absolute; right: 3px; top: 3px; bottom: 3px; width: 27px;
+  display: grid; place-items: center; border-radius: 5px; color: var(--faint);
+  transition: background .16s var(--ease), color .16s var(--ease);
+}
+.combo-toggle:hover { background: var(--surface-2); color: var(--ink-soft) }
+.category-menu {
+  left: 0; right: 0; top: calc(100% + 5px); min-width: 0;
+  max-height: 216px; overflow-y: auto;
+}
+.category-menu button { justify-content: space-between }
+.combo-empty { padding: 8px 9px; font-size: 12px; color: var(--faint); line-height: 1.4 }
+
+.seg { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 6px }
+.seg button {
+  height: 27px; border-radius: 4px; font-size: 12px; color: var(--muted);
+  transition: background .16s var(--ease), color .16s var(--ease);
+}
+.seg button:hover { background: var(--surface-2) }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink) }
+
+.stepper { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; height: 34px }
+.stepper input {
+  flex: 1; min-width: 0; height: 100%; border: none; outline: none; text-align: center;
+  font-family: var(--mono); font-size: 12.5px; background: transparent;
+}
+.stepper button { width: 32px; height: 100%; color: var(--muted); transition: background .16s var(--ease) }
+.stepper button:hover { background: var(--surface-2); color: var(--ink) }
+
+.tagline { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; min-height: 0 }
+.tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .05em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 9999px;
+  background: var(--pale-blue); color: var(--pale-blue-ink);
+}
+.tag button { color: inherit; opacity: .55; line-height: 0 }
+.tag button:hover { opacity: 1 }
+
+.meta-list {
+  margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line);
+  display: grid; gap: 7px;
+}
+.meta-row { display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px }
+.meta-row dt { color: var(--faint); letter-spacing: .03em }
+.meta-row dd { margin: 0; color: var(--ink-soft); text-align: right; word-break: break-all }
+
+/* The checkbox row on the submission dialog. Not in the original design — it
+   follows the field rhythm rather than inventing a second one. */
+.check {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 12.5px; color: var(--muted); line-height: 1.5; cursor: pointer;
+}
+.check input { margin: 3px 0 0; flex: none; accent-color: var(--ink); width: 15px; height: 15px }
+.check a { color: var(--ink-soft) }
+
+/* Honeypot: named like a real field so a naive bot fills it, removed from the
+   accessibility tree and the tab order so no person ever can. */
+.hp {
+  position: absolute; left: -9999px; width: 1px; height: 1px;
+  overflow: hidden; opacity: 0; pointer-events: none;
+}
