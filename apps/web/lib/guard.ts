@@ -19,7 +19,15 @@ export async function guard(
       return { ok: false, response: fail("Missing Origin header.", 403) };
     }
     try {
-      if (new URL(origin).host !== new URL(req.url).host) {
+      // req.url is reconstructed inside the serverless function and its host is
+      // not reliably the one the browser used, so the configured canonical
+      // origin counts too. Mirrors sameOrigin() in ./ratelimit.
+      const source = new URL(origin);
+      const allowed = process.env.PUBLIC_SITE_URL;
+      const matches =
+        source.host === new URL(req.url).host ||
+        Boolean(allowed && new URL(allowed).host === source.host);
+      if (!matches) {
         return { ok: false, response: fail("Cross-origin request refused.", 403) };
       }
     } catch {
