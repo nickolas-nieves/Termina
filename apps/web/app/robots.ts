@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { publicSiteUrl } from "@/lib/urls";
 
 export default function robots(): MetadataRoute.Robots {
-  const site = process.env.PUBLIC_SITE_URL ?? "https://termina-icons.netlify.app";
+  const site = publicSiteUrl();
   return {
     rules: [
       {

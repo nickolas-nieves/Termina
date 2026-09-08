@@ -23,6 +23,29 @@ export function siteOrigin(req: Request): string {
   return new URL(req.url).origin;
 }
 
+/**
+ * The canonical origin, for metadata that is generated with no request in hand
+ * — `robots.ts`, `sitemap.ts`, `metadataBase`.
+ *
+ * There is deliberately no production hostname baked in here. A fork that
+ * forgets PUBLIC_SITE_URL should get obviously-wrong localhost URLs in its
+ * sitemap rather than quietly advertising somebody else's deployment.
+ */
+export function publicSiteUrl(): string {
+  const configured = process.env.PUBLIC_SITE_URL;
+  if (configured) {
+    try {
+      return new URL(configured).origin;
+    } catch {
+      /* misconfigured — fall through */
+    }
+  }
+  if (process.env.NODE_ENV === "production") {
+    console.warn("PUBLIC_SITE_URL is not set — canonical URLs will be wrong.");
+  }
+  return "http://localhost:3000";
+}
+
 export function redirectUri(req: Request): string {
   return `${siteOrigin(req)}/api/auth/callback`;
 }
