@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { publishedAt, publishedIcons } from "@/lib/published";
+import { publicSiteUrl } from "@/lib/urls";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const site = process.env.PUBLIC_SITE_URL ?? "https://termina-icons.netlify.app";
+  const site = publicSiteUrl();
   const lastModified = publishedAt ? new Date(publishedAt) : new Date();
 
   return [

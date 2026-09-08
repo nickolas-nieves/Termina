@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { ThemeScript } from "@/components/ThemeScript";
 import { ToastProvider } from "@/components/Toast";
+import { publicSiteUrl } from "@/lib/urls";
 import "./globals.css";
 
-const siteUrl = process.env.PUBLIC_SITE_URL ?? "https://termina-icons.netlify.app";
+const siteUrl = publicSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

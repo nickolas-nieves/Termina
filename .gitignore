@@ -3,6 +3,7 @@ node_modules/
 .netlify/
 out/
 dist/
+*.tsbuildinfo
 
 # Local key/value store used when Netlify Blobs is unavailable (plain `next dev`).
 # It holds sessions, the working set and the submission queue — never commit it.
