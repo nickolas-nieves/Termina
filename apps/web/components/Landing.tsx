@@ -62,7 +62,7 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
           </div>
         </div>
         {/* Decorative: the reel says the same thing the copy already says. */}
-        <HeroBoard frames={[MARK_BITS, ...drawn.slice(0, 14).map((i) => i.pixels)]} />
+        <HeroBoard frames={[MARK_BITS, ...drawn.sort(() => Math.random() - 0.5).slice(0, 14).map((i) => i.pixels)]} />
       </section>
 
       <div className="sec-head">
