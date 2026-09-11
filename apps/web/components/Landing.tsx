@@ -8,7 +8,7 @@ import { useToast } from "./Toast";
 import { usePrefersReducedMotion } from "./useTheme";
 import { download } from "@/lib/browser";
 import { setZip } from "@/lib/exports";
-import { ArrowDown, Download, ExternalLink, Link as LinkIcon } from "termina-icons/react";
+import { Download, ExternalLink, Link as LinkIcon } from "termina-icons/react";
 
 /* The T mark, drawn on the same 13×13 grid as every glyph in the set. It is
    the first frame of the hero reel, so the board opens on something known. */
