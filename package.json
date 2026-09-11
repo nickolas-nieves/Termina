@@ -17,10 +17,11 @@
   },
   "scripts": {
     "dev": "npm run dev --workspace apps/web",
+    "postinstall": "npm run build --workspace packages/icons",
     "build": "npm run build --workspace packages/icons && npm run build --workspace apps/web",
     "start": "npm run start --workspace apps/web",
     "lint": "npm run lint --workspace apps/web",
-    "typecheck": "npm run typecheck --workspace apps/web && npm run typecheck --workspace packages/icons",
+    "typecheck": "npm run typecheck --workspace packages/icons && npm run typecheck --workspace apps/web",
     "test": "node --test scripts/*.test.mjs",
     "icons:check": "node scripts/check-icons.mjs",
     "icons:write": "node scripts/write-icons.mjs",
