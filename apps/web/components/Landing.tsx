@@ -28,8 +28,9 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
     toast(`Downloaded ${icons.length} SVG${icons.length === 1 ? "" : "s"}`);
   }
 
-  const strip = icons.filter((i) => i.pixels).slice(0, 5);
-  const first = icons.find((i) => i.pixels);
+  const strip = icons.filter((i) => i.pixels).sort(() => Math.random() - 0.5).slice(0, 5);
+  const first = icons.filter((i) => i.pixels).sort(() => Math.random() - 0.5)[0];
+  
 
   return (
     <div className="landing">
@@ -39,20 +40,20 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
           <p className="hero-sub">
             {icons.length ? (
               <>
-                <b>{icons.length}</b> glyph{icons.length === 1 ? "" : "s"}, all on the same 13 by 13
-                grid, exported as SVG that inherits currentColor.
+                A fully open source, community created set of <b>{icons.length}</b> glyph{icons.length === 1 ? "" : "s"}, all on the same 13 by 13
+                grid for use in any project.
               </>
             ) : (
-              "Every glyph lives on the same 13 by 13 grid and exports as SVG that inherits currentColor."
+              "A fully open source, community created set, all on the same 13 by 13 grid for use in any project."
             )}
           </p>
           <div className="hero-cta">
             <a className="btn btn-primary" href="#drawer">
               Browse the set
             </a>
-            <button className="btn" type="button" onClick={downloadAll}>
-              Download SVGs
-            </button>
+            <a className="btn" href="/editor">
+              Create a glyph
+            </a>
           </div>
         </div>
         {/* Decorative: the reel says the same thing the copy already says. */}
@@ -61,7 +62,7 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
 
       <div className="sec-head">
         <h2>How the set is built</h2>
-        <p>One grid, one export path, and enough metadata to find a glyph six months from now.</p>
+        <p>One grid, one export path, and succinct metadata that is easy to use wherever you need it.</p>
       </div>
 
       <section className="about">
@@ -76,7 +77,7 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
           <div>
             <h3>One grid, no exceptions</h3>
             <p>
-              Every glyph occupies the same {CELLS} cells. Nothing sits half a pixel off, so weight
+              Every glyph occupies the same {CELLS} cells. Every glyph is perfect, so weight
               and rhythm stay even across the whole set.
             </p>
           </div>
@@ -89,8 +90,7 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
           <div>
             <h3>Sharp SVG, small files</h3>
             <p>
-              Runs of pixels merge into single rects. No paths to simplify, no strokes that drift
-              when you scale them.
+              Runs of pixels merge into single rects and allow for smooth scaling at any size.
             </p>
           </div>
         </article>
@@ -125,10 +125,9 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
             </div>
           ) : null}
           <div>
-            <h3>Named, slugged, filed</h3>
+            <h3>Named, slugged, and filed</h3>
             <p>
-              Each glyph carries a name, a stable slug, a category and keywords, so search finds it
-              by whatever you happen to call it.
+              Each glyph carries a name, a stable slug, a category and keywords, so search supports easier discovery.
             </p>
           </div>
         </article>
@@ -143,16 +142,16 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
           <span className="res-body">
             <span className="res-t">Download SVGs</span>
             <span className="res-d">
-              Every glyph as its own file, plus the JSON manifest and the licence, in one zip.
+              Every glyph as its own file, plus the JSON manifest and the licence, in a zip file.
             </span>
           </span>
           <DownArrowLong className="res-go" />
         </button>
         <Link className="res" href="/editor">
           <span className="res-body">
-            <span className="res-t">Draw one yourself</span>
+            <span className="res-t">Create a glyph</span>
             <span className="res-d">
-              Open the editor, draw on the same grid, and submit it for the set. No account needed.
+              Open the editor, create a glyph, and download for yourself or submit it for the set.
             </span>
           </span>
           <External className="res-go" />
@@ -166,7 +165,7 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
           <span className="res-body">
             <span className="res-t">Source on GitHub</span>
             <span className="res-d">
-              The studio the set is drawn in, the export code, and the glyph format.
+              The source code for the set, the editor, and the library. All open source and free to use.
             </span>
           </span>
           <External className="res-go" />
@@ -180,7 +179,7 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
           <span className="res-body">
             <span className="res-t">Install from npm</span>
             <span className="res-d">
-              <code>npm i termina-icons</code> — raw SVG, an SVG sprite, and React components.
+              <code>npm i termina-icons</code>
             </span>
           </span>
           <External className="res-go" />

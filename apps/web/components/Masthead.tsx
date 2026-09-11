@@ -94,7 +94,7 @@ export function Masthead({ icons }: { icons: PublicIcon[] }) {
           {(close) => (
             <>
               <Link role="menuitem" href="/editor" onClick={close}>
-                Submit an icon<span className="sub">no sign-in</span>
+                Submit an icon
               </Link>
               <a
                 role="menuitem"
@@ -102,7 +102,7 @@ export function Masthead({ icons }: { icons: PublicIcon[] }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Source on GitHub<span className="sub">MIT</span>
+                Source on GitHub
               </a>
               <hr />
               {/* The appearance row cycles in place, so it is the one item that
@@ -111,7 +111,7 @@ export function Masthead({ icons }: { icons: PublicIcon[] }) {
                 Appearance<span className="sub">{THEME_LABEL[theme]}</span>
               </button>
               <Link role="menuitem" href="/admin" onClick={close}>
-                Admin<span className="sub">sign in</span>
+                Admin
               </Link>
             </>
           )}
