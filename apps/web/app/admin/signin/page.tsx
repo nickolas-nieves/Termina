@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Mark } from "@/components/Mark";
-import { GitHub, Warn } from "@/components/Icons";
+import { CircleWarning } from "termina-icons/react";
 import { adminConfigured, adminLogins, requireAdmin } from "@/lib/admin";
 import { storeBackend } from "@/lib/store";
 
@@ -42,7 +42,7 @@ export default async function SignInPage({
 
         {error && MESSAGES[error] ? (
           <div className="notice notice-bad" style={{ textAlign: "left" }}>
-            <Warn />
+            <CircleWarning size={13} />
             <span>{MESSAGES[error]}</span>
           </div>
         ) : null}
@@ -55,7 +55,7 @@ export default async function SignInPage({
 
         {!configured ? (
           <div className="notice notice-warn" style={{ textAlign: "left" }}>
-            <Warn />
+            <CircleWarning size={13} />
             <span>
               This deployment is missing its admin configuration.{" "}
               {loginCount === 0
@@ -69,7 +69,7 @@ export default async function SignInPage({
             className="btn btn-primary btn-block"
             href={`/api/auth/login${next ? `?next=${encodeURIComponent(next)}` : ""}`}
           >
-            <GitHub />
+            {/* <GitHub /> */}
             Continue with GitHub
           </a>
         )}
