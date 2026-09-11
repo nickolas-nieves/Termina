@@ -73,8 +73,6 @@ export function Drawer({ icons }: { icons: PublicIcon[] }) {
     });
   }
 
-  let n = 0;
-
   return (
     <>
       <div className="drawer-head" id="drawer">
@@ -157,7 +155,6 @@ export function Drawer({ icons }: { icons: PublicIcon[] }) {
                 key={category}
                 category={category}
                 items={items}
-                startIndex={(n += items.length) - items.length}
                 copied={copied}
                 onCopy={copySVG}
                 onDownload={downloadSVG}
@@ -174,7 +171,6 @@ export function Drawer({ icons }: { icons: PublicIcon[] }) {
 function ItemGroup({
   category,
   items,
-  startIndex,
   copied,
   onCopy,
   onDownload,
@@ -182,7 +178,6 @@ function ItemGroup({
 }: {
   category: string;
   items: PublicIcon[];
-  startIndex: number;
   copied: string | null;
   onCopy: (i: PublicIcon) => void;
   onDownload: (i: PublicIcon) => void;
@@ -202,12 +197,8 @@ function ItemGroup({
           Download
         </button>
       </div>
-      {items.map((icon, i) => (
-        <article
-          className="card"
-          key={icon.slug}
-          style={{ ["--i" as string]: String(startIndex + i) }}
-        >
+      {items.map((icon) => (
+        <article className="card" key={icon.slug}>
           <div className="row-actions">
             <button
               className="icon-btn"

@@ -28,9 +28,14 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
     toast(`Downloaded ${icons.length} SVG${icons.length === 1 ? "" : "s"}`);
   }
 
-  const strip = icons.filter((i) => i.pixels).sort(() => Math.random() - 0.5).slice(0, 5);
-  const first = icons.filter((i) => i.pixels).sort(() => Math.random() - 0.5)[0];
-  
+  /* The server render and the first client paint have to agree, so both start
+     from the set's own order; the shuffle waits until after hydration. */
+  const [picks, setPicks] = useState(() => icons.filter((i) => i.pixels));
+  useEffect(() => {
+    setPicks(icons.filter((i) => i.pixels).sort(() => Math.random() - 0.5));
+  }, [icons]);
+  const strip = picks.slice(0, 5);
+  const first = picks[0];
 
   return (
     <div className="landing">

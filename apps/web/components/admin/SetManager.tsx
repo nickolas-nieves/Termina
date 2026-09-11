@@ -346,7 +346,6 @@ export function SetManager({ entries: initial }: { entries: Entry[] }) {
                   <article
                     className={`card${busy === entry.id ? " is-busy" : ""}${checked ? " is-selected" : ""}`}
                     key={entry.id}
-                    style={{ ["--i" as string]: String(index) }}
                   >
                     {isWorking(entry) ? (
                       <button

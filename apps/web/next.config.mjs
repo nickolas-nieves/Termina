@@ -17,10 +17,17 @@
  * To tighten `script-src` later: add middleware that mints a nonce per request
  * and sets this header with `'nonce-<value>' 'strict-dynamic'`, give
  * ThemeScript the same nonce, and accept dynamic rendering.
+ *
+ * `next dev` needs two relaxations the production build does not: its webpack
+ * chunks and Fast Refresh run through `eval`, so without 'unsafe-eval' the page
+ * never hydrates and every client-side control is dead; and
+ * `upgrade-insecure-requests` would push http://localhost to https in Safari.
  */
+const dev = process.env.NODE_ENV === "development";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}`,
   // Inline `style={{...}}` attributes are used throughout the editor and admin.
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data:",
@@ -31,7 +38,7 @@ const csp = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  "upgrade-insecure-requests",
+  ...(dev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
 /** @type {import('next').NextConfig} */

@@ -47,11 +47,10 @@
   .drawer-head, .filters-inner, .grid-wrap, .landing, .foot-inner { padding-left: 18px; padding-right: 18px }
 }
 
-/* The board reel and the card cascade are decoration; both hold their final
-   frame when the reader has asked for stillness. */
+/* The board reel is decoration; it holds its final frame when the reader has
+   asked for stillness. */
 @media (prefers-reduced-motion: reduce) {
   .hero-board i { transition: none }
-  .card { animation: none; opacity: 1; transform: none }
   * { scroll-behavior: auto !important }
 }
 

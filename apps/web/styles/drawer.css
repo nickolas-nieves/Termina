@@ -163,11 +163,7 @@
   padding: 22px 16px 14px;
   display: flex; flex-direction: column; align-items: center; gap: 14px;
   transition: box-shadow .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease);
-  opacity: 0; transform: translateY(12px);
-  animation: enter .6s var(--ease) forwards;
-  animation-delay: calc(var(--i,0) * 26ms);
 }
-@keyframes enter { to { opacity: 1; transform: none } }
 .card:hover { box-shadow: var(--shadow-2); border-color: var(--line-strong) }
 .card.is-editing { border-color: var(--ink) }
 .card .glyph {
