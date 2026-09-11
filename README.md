@@ -17,7 +17,7 @@ termina/
 │   ├── glyph/              the glyph format and everything derived from it
 │   └── icons/              the publishable npm package, built from icons/
 ├── scripts/                icon-set integrity checks and the legacy importer
-└── docs/                   deployment, architecture, publishing, anti-abuse
+└── docs/                   deployment, architecture, anti-abuse
 ```
 
 ## What it does
@@ -155,7 +155,6 @@ duplicating.
 
 - [docs/deployment.md](docs/deployment.md) — deploying, and the environment it needs
 - [docs/architecture.md](docs/architecture.md) — how the pieces fit, and why
-- [docs/npm-package.md](docs/npm-package.md) — what an npm package is and how to publish this one
 - [docs/anti-abuse.md](docs/anti-abuse.md) — what protects the submission endpoint
 - [SECURITY.md](SECURITY.md) — reporting a vulnerability
 
