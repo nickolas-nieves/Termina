@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import type { PublicIcon } from "@termina/glyph";
 import { Mark, Wordmark } from "./Mark";
 import { Menu } from "./Menu";
-import { Chevron, Dots, Question } from "./Icons";
 import { useToast } from "./Toast";
 import { useTheme } from "./useTheme";
 import { THEME_LABEL } from "./ThemeScript";
 import { downloadText, download } from "@/lib/browser";
 import { manifestJSON, setZip, sheetSVG } from "@/lib/exports";
+import { ChevronDown, Ellipsis, CircleQuestion } from "termina-icons/react"
 
 /**
  * The public site header. Three tracks, so the wordmark stays optically
@@ -64,7 +64,7 @@ export function Masthead({ icons }: { icons: PublicIcon[] }) {
           trigger={
             <>
               Export
-              <Chevron />
+              <ChevronDown size={13} />
             </>
           }
         >
@@ -90,7 +90,7 @@ export function Masthead({ icons }: { icons: PublicIcon[] }) {
           )}
         </Menu>
 
-        <Menu label="More actions" className="btn btn-ghost more-btn" trigger={<Dots />}>
+        <Menu label="More actions" className="btn btn-ghost more-btn" trigger={<Ellipsis />}>
           {(close) => (
             <>
               <Link role="menuitem" href="/editor" onClick={close}>
@@ -121,7 +121,7 @@ export function Masthead({ icons }: { icons: PublicIcon[] }) {
           label="Keyboard shortcuts"
           className="btn btn-ghost tips-btn"
           menuClassName="menu-tips"
-          trigger={<Question />}
+          trigger={<CircleQuestion size={13} />}
         >
           {() => (
             <>

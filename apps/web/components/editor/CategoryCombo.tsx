@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Chevron } from "../Icons";
+import { ChevronDown } from "termina-icons/react";
 
 /**
  * Category is a combobox: free text (categories are user-defined) plus a
@@ -72,7 +72,7 @@ export function CategoryCombo({
           input.current?.focus();
         }}
       >
-        <Chevron />
+        <ChevronDown size={13} />
       </button>
       <div className={`menu category-menu${open ? " is-open" : ""}`} id={id} role="listbox">
         {!options.length ? (

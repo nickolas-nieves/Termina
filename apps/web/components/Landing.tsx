@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CELLS, N, type PublicIcon } from "@termina/glyph";
 import { Glyph } from "./Glyph";
-import { DownArrowLong, External } from "./Icons";
 import { useToast } from "./Toast";
 import { usePrefersReducedMotion } from "./useTheme";
 import { download } from "@/lib/browser";
 import { setZip } from "@/lib/exports";
+import { ArrowDown, Download, ExternalLink, Link as LinkIcon } from "termina-icons/react";
 
 /* The T mark, drawn on the same 13×13 grid as every glyph in the set. It is
    the first frame of the hero reel, so the board opens on something known. */
@@ -150,7 +150,10 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
               Every glyph as its own file, plus the JSON manifest and the licence, in a zip file.
             </span>
           </span>
-          <DownArrowLong className="res-go" />
+
+          <span className="res-go">
+            <Download size={16}/>
+          </span>
         </button>
         <Link className="res" href="/editor">
           <span className="res-body">
@@ -159,7 +162,9 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
               Open the editor, create a glyph, and download for yourself or submit it for the set.
             </span>
           </span>
-          <External className="res-go" />
+          <span className="res-go">
+            <LinkIcon size={16}/>
+          </span>
         </Link>
         <a
           className="res"
@@ -173,7 +178,9 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
               The source code for the set, the editor, and the library. All open source and free to use.
             </span>
           </span>
-          <External className="res-go" />
+          <span className="res-go">
+            <ExternalLink size={16}/>
+          </span>
         </a>
         <a
           className="res"
@@ -187,7 +194,9 @@ export function Landing({ icons }: { icons: PublicIcon[] }) {
               <code>npm i termina-icons</code>
             </span>
           </span>
-          <External className="res-go" />
+          <span className="res-go">
+            <ExternalLink size={16}/>
+          </span>
         </a>
       </section>
     </div>

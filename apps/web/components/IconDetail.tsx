@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { componentName, glyphFile, type PublicIcon } from "@termina/glyph";
 import { Glyph } from "./Glyph";
-import { Check, CopyIcon, DownloadIcon } from "./Icons";
+import { Check, Copy, Download } from "termina-icons/react";
 import { useToast } from "./Toast";
 import { copyText, downloadText } from "@/lib/browser";
 
@@ -107,7 +107,7 @@ export function IconDetail({ icon }: { icon: PublicIcon }) {
               type="button"
               onClick={() => copy("file", file, `Copied ${icon.slug}.svg`)}
             >
-              {copied === "file" ? <Check /> : <CopyIcon />}
+              {copied === "file" ? <Check size={13} /> : <Copy size={13} />}
               Copy SVG
             </button>
             <button
@@ -115,7 +115,7 @@ export function IconDetail({ icon }: { icon: PublicIcon }) {
               type="button"
               onClick={() => downloadText(`${icon.slug}.svg`, file, "image/svg+xml")}
             >
-              <DownloadIcon />
+              <Download size={13} />
               Download SVG
             </button>
             <Link className="btn" href={`/editor?edit=${encodeURIComponent(icon.slug)}`}>
@@ -140,7 +140,7 @@ export function IconDetail({ icon }: { icon: PublicIcon }) {
                 type="button"
                 onClick={() => copy(s.id, s.code, `Copied the ${s.title.split(" —")[0]} snippet`)}
               >
-                {copied === s.id ? <Check size={12} /> : <CopyIcon size={12} />}
+                {copied === s.id ? <Check size={13} /> : <Copy size={13} />}
                 Copy
               </button>
             </div>

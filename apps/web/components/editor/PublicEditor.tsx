@@ -8,7 +8,7 @@ import { CoreFields } from "./Fields";
 import { SubmitDialog } from "./SubmitDialog";
 import { clearDraft, readDraft, useDraft, useGlyphEditor } from "./useGlyphEditor";
 import { EMPTY_FORM, useGlyphForm, type GlyphForm } from "./useGlyphForm";
-import { Check, CopyIcon, DownloadIcon, Send } from "../Icons";
+import { Check, Copy, Download, Send } from "termina-icons/react";
 import { useToast } from "../Toast";
 import { copyText, downloadText } from "@/lib/browser";
 
@@ -198,15 +198,15 @@ export function PublicEditor({ icons }: { icons: PublicIcon[] }) {
 
             <div className="side-foot">
               <button className="btn btn-primary btn-block" type="button" onClick={openSubmit}>
-                <Send />
+                <Send size={13} />
                 {editing ? "Submit this change" : "Submit for review"}
               </button>
               <button className="btn btn-block" type="button" onClick={downloadSVG}>
-                <DownloadIcon />
+                <Download size={13} />
                 Download SVG
               </button>
               <button className="btn btn-block" type="button" onClick={copySVG}>
-                {copied ? <Check /> : <CopyIcon />}
+                {copied ? <Check size={13} /> : <Copy size={13} />}
                 Copy SVG
               </button>
               <button className="btn btn-ghost btn-block" type="button" onClick={startBlank}>

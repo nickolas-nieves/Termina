@@ -16,7 +16,7 @@ import { Studio } from "../editor/Studio";
 import { CoreFields } from "../editor/Fields";
 import { useGlyphEditor } from "../editor/useGlyphEditor";
 import { EMPTY_FORM, useGlyphForm } from "../editor/useGlyphForm";
-import { Check, CopyIcon, DownloadIcon } from "../Icons";
+import { Check, Copy, Download } from "termina-icons/react";
 import { useToast } from "../Toast";
 import { copyText, downloadText, relTime } from "@/lib/browser";
 
@@ -289,7 +289,7 @@ export function AdminEditor({
                   downloadText(`${effectiveSlug}.svg`, file(), "image/svg+xml");
                 }}
               >
-                <DownloadIcon />
+                <Download size={13}/>
                 SVG
               </button>
               <button
@@ -304,7 +304,7 @@ export function AdminEditor({
                   toast("SVG copied to clipboard");
                 }}
               >
-                {copied ? <Check /> : <CopyIcon />}
+                {copied ? <Check size={13}/> : <Copy size={13} />}
                 Copy
               </button>
             </div>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Mark, Wordmark } from "../Mark";
 import { Menu } from "../Menu";
-import { Dots } from "../Icons";
+import { Ellipsis } from "termina-icons/react";
 import { useTheme } from "../useTheme";
 import { THEME_LABEL } from "../ThemeScript";
 
@@ -45,7 +45,7 @@ export function AdminMasthead({ login }: { login: string | null }) {
           </span>
         ) : null}
 
-        <Menu label="More actions" className="btn btn-ghost more-btn" trigger={<Dots />}>
+        <Menu label="More actions" className="btn btn-ghost more-btn" trigger={<Ellipsis />}>
           {(close) => (
             <>
               <Link role="menuitem" href="/" onClick={close}>

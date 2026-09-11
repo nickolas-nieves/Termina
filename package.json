@@ -2,7 +2,7 @@
   "name": "termina",
   "version": "0.0.0",
   "private": true,
-  "description": "Termina \u2014 a pixel icon set drawn on a 13\u00d713 grid, and the studio it is drawn in.",
+  "description": "Termina — a pixel icon set drawn on a 13×13 grid, and the studio it is drawn in.",
   "license": "MIT",
   "type": "module",
   "workspaces": [
@@ -26,5 +26,11 @@
     "icons:write": "node scripts/write-icons.mjs",
     "icons:import": "node scripts/import-legacy.mjs",
     "icons:raster": "node scripts/make-icons.mjs"
+  },
+  "dependencies": {
+    "termina-icons": "^0.2.0"
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
   }
 }

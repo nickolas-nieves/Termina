@@ -1,6 +1,6 @@
 {
   "name": "termina-icons",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "description": "Termina — pixel icons drawn on a 13×13 grid. Raw SVG, an SVG sprite, and tree-shakeable React components.",
   "license": "MIT",
   "author": "Nickolas Nieves",

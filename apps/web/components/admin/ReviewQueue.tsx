@@ -6,7 +6,7 @@ import { glyphFile, type PublicIcon, type SubmissionStatus } from "@termina/glyp
 import type { SubmissionView } from "@/lib/submissions";
 import { Dialog } from "../Dialog";
 import { Glyph } from "../Glyph";
-import { ArrowRightLong, Check, Cross, DownloadIcon, Trash } from "../Icons";
+import { ArrowRight, Check, X, Download, Trash } from "termina-icons/react";
 import { useToast } from "../Toast";
 import { CategoryCombo } from "../editor/CategoryCombo";
 import { downloadText, relTime } from "@/lib/browser";
@@ -124,7 +124,7 @@ export function ReviewQueue({
                       <span className="sub-tile was" title={`Published: ${live.name}`}>
                         <Glyph pixels={live.pixels} size={34} />
                       </span>
-                      <ArrowRightLong className="sub-arrow" />
+                      <ArrowRight className="sub-arrow" size={13} />
                     </>
                   ) : null}
                   <span className="sub-tile" title="Submitted">
@@ -204,12 +204,12 @@ export function ReviewQueue({
                       )
                     }
                   >
-                    <DownloadIcon />
+                    <Download size={13} />
                   </button>
                   {sub.status === "pending" ? (
                     <>
                       <button className="btn btn-danger" type="button" onClick={() => act(sub, "reject")}>
-                        <Cross />
+                        <X size={13} />
                         Reject
                       </button>
                       <button
@@ -217,13 +217,13 @@ export function ReviewQueue({
                         type="button"
                         onClick={() => setAccepting(sub)}
                       >
-                        <Check />
+                        <Check size={13} />
                         Accept
                       </button>
                     </>
                   ) : (
                     <button className="btn btn-danger" type="button" onClick={() => act(sub, "delete")}>
-                      <Trash />
+                      <Trash size={13} />
                       Delete
                     </button>
                   )}

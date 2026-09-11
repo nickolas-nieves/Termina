@@ -4,7 +4,7 @@ import { useState } from "react";
 import { MAX_CREDIT, MAX_NOTE, type PublicIcon } from "@termina/glyph";
 import { Dialog } from "../Dialog";
 import { Glyph } from "../Glyph";
-import { ArrowRightLong } from "../Icons";
+import { ArrowRight } from "termina-icons/react";
 import { useToast } from "../Toast";
 import type { GlyphForm } from "./useGlyphForm";
 
@@ -124,7 +124,7 @@ export function SubmitDialog({
             <span className="sub-tile was" title="Currently published">
               <Glyph pixels={editing.pixels} size={34} />
             </span>
-            <ArrowRightLong className="sub-arrow" />
+            <ArrowRight className="sub-arrow" size={13}/>
           </>
         ) : null}
         <span className="sub-tile" title="Your version">

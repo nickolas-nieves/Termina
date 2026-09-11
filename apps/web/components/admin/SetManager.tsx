@@ -12,7 +12,7 @@ import {
 } from "@termina/glyph";
 import type { Entry } from "@/lib/working";
 import { Glyph } from "../Glyph";
-import { Check, CopyIcon, DownloadIcon, Search, Trash } from "../Icons";
+import { Check, Copy, Download, Search, Trash } from "termina-icons/react";
 import { useToast } from "../Toast";
 import { PublishDialog } from "./PublishDialog";
 import { copyText, download, downloadText } from "@/lib/browser";
@@ -268,7 +268,7 @@ export function SetManager({ entries: initial }: { entries: Entry[] }) {
 
       <div className="filters-inner" style={{ padding: "0 0 20px" }}>
         <div className="search">
-          <Search />
+          <Search size={13}/>
           <input
             placeholder="Search the set"
             autoComplete="off"
@@ -334,7 +334,7 @@ export function SetManager({ entries: initial }: { entries: Entry[] }) {
                   onClick={() => downloadCategory(category, items)}
                   title={`Download every glyph in ${category} as a zip`}
                 >
-                  <DownloadIcon size={12} />
+                  <Download size={13} />
                   Download
                 </button>
               </div>
@@ -369,7 +369,7 @@ export function SetManager({ entries: initial }: { entries: Entry[] }) {
                         aria-label={`Copy ${entry.name} as SVG`}
                         onClick={() => copySVG(entry)}
                       >
-                        {copied === entry.id ? <Check /> : <CopyIcon />}
+                        {copied === entry.id ? <Check size={13}/> : <Copy size={13} />}
                       </button>
                       <button
                         className="icon-btn"
@@ -380,7 +380,7 @@ export function SetManager({ entries: initial }: { entries: Entry[] }) {
                           downloadText(`${entry.slug}.svg`, glyphFile(entry), "image/svg+xml")
                         }
                       >
-                        <DownloadIcon />
+                        <Download size={13} />
                       </button>
                       {isWorking(entry) ? (
                         <button

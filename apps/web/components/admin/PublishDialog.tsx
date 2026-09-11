@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { PublicIcon } from "@termina/glyph";
 import { Dialog } from "../Dialog";
 import { Glyph } from "../Glyph";
-import { Warn } from "../Icons";
+import { CircleWarning } from "termina-icons/react";
 import { useToast } from "../Toast";
 
 interface Plan {
@@ -107,7 +107,7 @@ export function PublishDialog({
         <p>Working out what would change…</p>
       ) : error && !plan ? (
         <div className="notice notice-bad">
-          <Warn />
+          <CircleWarning size={13} />
           <span>{error}</span>
         </div>
       ) : plan ? (
@@ -142,7 +142,7 @@ export function PublishDialog({
 
           {!plan.configured ? (
             <div className="notice notice-bad">
-              <Warn />
+              <CircleWarning size={13} />
               <span>
                 <code>GITHUB_REPO</code> is not set, so there is nowhere to publish to. See{" "}
                 <code>docs/deployment.md</code>.
@@ -152,7 +152,7 @@ export function PublishDialog({
 
           {plan.repoError ? (
             <div className="notice notice-bad">
-              <Warn />
+              <CircleWarning size={13} />
               <span>{plan.repoError}</span>
             </div>
           ) : null}
@@ -197,7 +197,7 @@ export function PublishDialog({
 
           {plan.held.length ? (
             <div className="notice notice-warn" style={{ marginTop: 16 }}>
-              <Warn />
+              <CircleWarning size={13} />
               <span>
                 {plan.held.length}{plan.scoped ? " of the selected" : ""} glyph
                 {plan.held.length === 1 ? "" : "s"} held back —{" "}

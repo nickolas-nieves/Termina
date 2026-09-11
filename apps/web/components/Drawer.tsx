@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { glyphFile, groupByCategory, matchesQuery, type PublicIcon } from "@termina/glyph";
 import { Glyph } from "./Glyph";
-import { Check, CopyIcon, DownloadIcon, DownArrowLong, Search } from "./Icons";
+import { Check, Copy, Download, Search } from "termina-icons/react";
 import { useToast } from "./Toast";
 import { copyText, download, downloadText } from "@/lib/browser";
 import { setZip } from "@/lib/exports";
@@ -193,7 +193,7 @@ function ItemGroup({
           onClick={() => onDownloadCategory(category, items)}
           title={`Download every glyph in ${category} as a zip`}
         >
-          <DownArrowLong size={12} />
+          <Download size={13} />
           Download
         </button>
       </div>
@@ -207,7 +207,7 @@ function ItemGroup({
               aria-label={`Copy ${icon.name} as SVG`}
               onClick={() => onCopy(icon)}
             >
-              {copied === icon.slug ? <Check /> : <CopyIcon />}
+              {copied === icon.slug ? <Check size={13 }/> : <Copy size={13 }/>}
             </button>
             <button
               className="icon-btn"
@@ -216,7 +216,7 @@ function ItemGroup({
               aria-label={`Download ${icon.name} as SVG`}
               onClick={() => onDownload(icon)}
             >
-              <DownloadIcon />
+              <Download size={13 }/>
             </button>
           </div>
           <Link className="glyph" href={`/icons/${icon.slug}`} title={`Open ${icon.name}`}>
